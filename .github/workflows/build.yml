@@ -46,7 +46,7 @@ jobs:
         run: |
           rm -rf .buildozer bin/
 
-      - name: Build APK with Buildozer
+      - name: Build APK with Buildozer (Debug Level 2)
         env:
           BUILDER_SET_VERSION: "1"
         run: |
@@ -54,7 +54,10 @@ jobs:
           unset ANDROID_NDK
           unset ANDROID_NDK_HOME
           unset ANDROID_NDK_ROOT
-          echo y | ~/.local/bin/buildozer -v android debug
+          unset ANDROID_NDK_LATEST_HOME
+          
+          # Esegue buildozer con log verboso al massimo per catturare l'errore reale
+          echo y | ~/.local/bin/buildozer -v android debug log_level=2
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
