@@ -12,28 +12,13 @@ jobs:
       - name: Checkout del codice
         uses: actions/checkout@v4
 
-      - name: Imposta Python 3.11
-        uses: actions/setup-python@v5
+      - name: Compila APK con Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
         with:
-          python-version: '3.11'
+          command: buildozer -v android debug
+          buildozer_version: master
 
-      - name: Installa dipendenze di sistema e Buildozer
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-              git zip unzip openjdk-17-jdk python3-pip \
-              autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
-              libncursesw5-dev cmake libffi-dev libssl-dev
-          pip install --upgrade pip
-          pip install --user --upgrade buildozer cython==0.29.36 python-for-android
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Compilare l'APK con Buildozer
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          buildozer -v android debug
-
-      - name: Caricare l'APK come Artefatto
+      - name: Carica l'APK come Artefatto
         uses: actions/upload-artifact@v4
         with:
           name: pacchetto-apk
