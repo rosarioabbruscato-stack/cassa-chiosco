@@ -29,15 +29,15 @@ jobs:
           pip install --user Cython==0.29.36 buildozer
 
       - name: Compila APK
-        env:
-          ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          rm -rf /home/runner/.buildozer/android/platform/android-ndk-r28c
-          export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
-          export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
-          export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
-          buildozer -v --log-level 2 android debug
+     env:
+       ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
+     run: |
+       export PATH="$HOME/.local/bin:$PATH"
+       rm -rf /home/runner/.buildozer/android/platform/android-ndk-r28c
+       export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
+       export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
+       export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
+       buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
