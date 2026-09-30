@@ -35,6 +35,9 @@ jobs:
       - name: Compila APK
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
+          export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
+          export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           buildozer -v android debug
 
       - name: Carica l'APK come Artefatto
