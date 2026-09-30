@@ -1,8 +1,8 @@
-name: Compila APK Cassa Chiosco
+name: Build APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -18,15 +18,15 @@ jobs:
           python-version: '3.11'
 
       - name: Installa dipendenze di sistema e Buildozer
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk python3-pip \
-            autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
-            libncursesw5-dev cmake libffi-dev libssl-dev
-        pip install --upgrade pip
-        pip install --user --upgrade buildozer cython==0.29.36 python-for-android
-        echo "$HOME/.local/bin" >> $GITHUB_PATHZ
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+              git zip unzip openjdk-17-jdk python3-pip \
+              autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
+              libncursesw5-dev cmake libffi-dev libssl-dev
+          pip install --upgrade pip
+          pip install --user --upgrade buildozer cython==0.29.36 python-for-android
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Compilare l'APK con Buildozer
         run: |
