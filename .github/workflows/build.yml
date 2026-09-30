@@ -7,6 +7,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # Forziamo le variabili d'ambiente corrette per evitare l'uso dell'NDK 27/28
+    env:
+      ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25b
+      ANDROID_NDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
 
     steps:
       - name: Checkout del codice
@@ -27,7 +32,7 @@ jobs:
           pip install --upgrade pip
           pip install --user cython buildozer
 
-      - name: Pulisci build precedenti e compila APK
+      - name: Compila APK
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           buildozer -v android debug
