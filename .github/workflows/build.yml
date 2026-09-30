@@ -44,6 +44,10 @@ jobs:
       - name: Build APK with Buildozer
         env:
           BUILDER_SET_VERSION: "1"
+          # Rimuove i conflitti forzando l'ambiente a lasciare che sia Buildozer a gestire NDK/SDK
+          ANDROID_NDK: ""
+          ANDROID_NDK_HOME: ""
+          ANDROIDNDK: ""
         run: |
           echo y | ~/.local/bin/buildozer -v android debug
 
