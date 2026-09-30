@@ -493,3 +493,4 @@ warn_on_root = 1
 #
 #   Environment variable overrides have priority over profile overrides.
 android.ndk = 25.2.9519653
+android.ndk_version = 25b
