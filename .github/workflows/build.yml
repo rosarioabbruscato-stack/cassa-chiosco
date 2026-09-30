@@ -30,7 +30,6 @@ jobs:
       - name: Pulisci build precedenti e compila APK
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          buildozer clean
           buildozer -v android debug
 
       - name: Carica l'APK come Artefatto
