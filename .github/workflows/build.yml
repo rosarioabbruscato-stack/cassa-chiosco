@@ -26,6 +26,7 @@ jobs:
             unzip \
             autoconf \
             libtool \
+            libltdl-dev \
             pkg-config \
             zlib1g-dev \
             libncurses5-dev \
@@ -46,7 +47,7 @@ jobs:
         run: |
           rm -rf .buildozer bin/
 
-      - name: Build APK with Buildozer (Debug Level 2)
+      - name: Build APK with Buildozer
         env:
           BUILDER_SET_VERSION: "1"
         run: |
@@ -56,8 +57,7 @@ jobs:
           unset ANDROID_NDK_ROOT
           unset ANDROID_NDK_LATEST_HOME
           
-          # Esegue buildozer con log verboso al massimo per catturare l'errore reale
-          echo y | ~/.local/bin/buildozer -v android debug log_level=2
+          echo y | ~/.local/bin/buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
