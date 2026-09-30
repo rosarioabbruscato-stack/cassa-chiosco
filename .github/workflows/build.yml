@@ -1,3 +1,5 @@
+
+
 name: Build APK
 
 on:
@@ -7,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
+      ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25b
+      ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r25b
 
     steps:
       - uses: actions/checkout@v4
@@ -26,34 +32,34 @@ jobs:
           pip install --upgrade pip
           pip install --user Cython==0.29.36 buildozer
 
+      - name: Force NDK r25b in buildozer.spec
+        run: |
+          # Forza l'uso della versione 25b direttamente dentro le impostazioni di buildozer
+          if grep -q "android.ndk_version" buildozer.spec; then
+            sed -i 's/.*android.ndk_version.*/android.ndk_version = 25b/' buildozer.spec
+          else
+            echo "android.ndk_version = 25b" >> buildozer.spec
+          fi
+
       - name: Compila APK
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           
-          # Forza l'uso dell'NDK r25b pulendo eventuale spazzatura
+          # Rimuove l'NDK r28c eventualmente scaricato
           rm -rf /home/runner/.buildozer/android/platform/android-ndk-r28c
+          
+          # Esporta nuovamente per sicurezza
           export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           
-          # Esegue buildozer con log dettagliati (livello 2) per individuare l'errore esatto
-          buildozer --debug android debug
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: bin/*.apk
-
-
-
-
-
-
-
-
-
-
 
 
 
