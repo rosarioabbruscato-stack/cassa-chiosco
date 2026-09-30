@@ -331,7 +331,7 @@ android.allow_backup = True
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-p4a.branch = release-2024.09.13
+p4a.branch = v2024.01.21
 p4a.python_version = 3.11
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
