@@ -37,7 +37,7 @@ jobs:
           export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
-          buildozer -v android debug
+          buildozer -v --log-level 2 android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
