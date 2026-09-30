@@ -15,9 +15,8 @@ jobs:
 
       - name: Compila APK
         run: |
-          # Imposta la variabile d'ambiente per evitare il blocco root interattivo di buildozer
-          export BUILDER_ALLOW_ROOT=true
-          buildozer --accept-root -v android debug
+          # Il comando 'yes' risponde automaticamente alla richiesta [y/n] di Buildozer bypassando il blocco
+          yes | buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
