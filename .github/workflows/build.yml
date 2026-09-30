@@ -30,16 +30,15 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           
-          # Rimuove totalmente qualsiasi traccia dell'NDK r28c scaricato da github o buildozer
+          # Rimuove l'NDK r28c non compatibile
           rm -rf /home/runner/.buildozer/android/platform/android-ndk-r28c
           
-          # Configura rigorosamente tutte le variabili d'ambiente per puntare esclusivamente all'r25b
+          # Imposta le variabili per usare l'NDK r25b
           export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           
-          # Esegue buildozer pulendo eventuali build precedenti corrotte
-          buildozer clean
+          # Esegue la compilazione standard
           buildozer -v android debug
 
       - name: Upload APK
