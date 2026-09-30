@@ -1,4 +1,4 @@
-name: Risparmio per build cloud
+name: Compila APK Cassa Chiosco
 
 on:
   push:
@@ -9,15 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonare il repository
+      - name: Checkout del codice
         uses: actions/checkout@v4
 
-      - name: Impostare Python
+      - name: Imposta Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Installare dipendenze di sistema e Buildozer
+      - name: Installa dipendenze di sistema e Buildozer
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -26,19 +26,15 @@ jobs:
             libncursesw5-dev cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install --user --upgrade buildozer cython
-          # Aggiunge la cartella bin locale dell'utente al PATH di GitHub Actions
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Compilare l'APK con Buildozer
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          # Accetta automaticamente le licenze SDK prima della build
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | buildozer -v android debug
+          buildozer -v android debug
 
       - name: Caricare l'APK come Artefatto
         uses: actions/upload-artifact@v4
         with:
-          name: cassa-chiosco-apk
+          name: pacchetto-apk
           path: bin/*.apk
