@@ -32,7 +32,10 @@ jobs:
       - name: Compilare l'APK con Buildozer
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          buildozer -v android debug
+          # Accetta automaticamente le licenze SDK prima della build
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          yes | buildozer -v android debug
 
       - name: Caricare l'APK come Artefatto
         uses: actions/upload-artifact@v4
