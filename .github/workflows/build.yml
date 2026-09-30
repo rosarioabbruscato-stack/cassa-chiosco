@@ -2,40 +2,6 @@ name: Build APK
 
 on:
   push:
-  pull_request:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    # Forziamo le variabili d'ambiente corrette per evitare l'uso dell'NDK 27/28
-    env:
-      ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25b
-      ANDROID_NDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
-
-    steps:
-      - name: Checkout del codice
-        uses: actions/checkout@v4
-
-      - name: Imposta Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Installa dipendenze di sistema e Buildozer
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev libncursesw5-dev \
-            libffi-dev libssl-dev cmake
-          pip install --upgrade pip
-          pip install --user cython buildozer
-
-      name: Build APK
-
-on:
-  push:
     branches: [ main ]
 
 jobs:
@@ -43,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -77,12 +43,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: bin/*.apk
-
-      - name: Carica l'APK come Artefatto
-        uses: actions/upload-artifact@v4
-        with:
-          name: pacchetto-apk
           path: bin/*.apk
 
 
