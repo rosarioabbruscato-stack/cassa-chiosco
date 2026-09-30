@@ -49,14 +49,11 @@ jobs:
       - name: Build APK with Buildozer
         env:
           BUILDER_SET_VERSION: "1"
-          # Completely wipe out host-preinstalled NDK variables that cause toolchain mismatch conflicts
-          ANDROID_NDK: ""
-          ANDROID_NDK_HOME: ""
-          ANDROIDNDK: ""
-          ANDROID_NDK_ROOT: ""
-          ANDROID_HOME: "/home/runner/android-sdk"
-          ANDROID_SDK_ROOT: "/home/runner/android-sdk"
         run: |
+          unset ANDROIDNDK
+          unset ANDROID_NDK
+          unset ANDROID_NDK_HOME
+          unset ANDROID_NDK_ROOT
           echo y | ~/.local/bin/buildozer -v android debug
 
       - name: Upload APK
