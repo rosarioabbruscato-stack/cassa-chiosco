@@ -13,11 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-    - name: Compila APK
-      run: |
-        git config --global --add safe.directory /__w/cassa-chiosco/cassa-chiosco
-        export BUILDER_SET_VERSION=1
-        yes | buildozer android debug
+      - name: Compila APK
+        run: |
+          git config --global --add safe.directory /__w/cassa-chiosco/cassa-chiosco
+          export BUILDER_SET_VERSION=1
+          yes | buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
