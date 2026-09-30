@@ -9,18 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: kivy/buildozer:latest
-      options: --user root
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fix directory permissions
-        run: |
-          chown -R root:root /github/home
-
       - name: Compila APK
         run: |
-          # Pulisce eventuali residui e avvia la build pulita dentro il container isolato
           buildozer -v android debug
 
       - name: Upload APK
