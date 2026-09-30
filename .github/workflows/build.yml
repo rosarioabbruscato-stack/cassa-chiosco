@@ -30,16 +30,14 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           
-          # Rimuove l'NDK r28c non compatibile
+          # Forza l'uso dell'NDK r25b pulendo eventuale spazzatura
           rm -rf /home/runner/.buildozer/android/platform/android-ndk-r28c
-          
-          # Imposta le variabili per usare l'NDK r25b
           export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           
-          # Esegue la compilazione standard
-          buildozer -v android debug
+          # Esegue buildozer con log dettagliati (livello 2) per individuare l'errore esatto
+          buildozer --debug android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
