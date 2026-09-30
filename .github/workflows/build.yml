@@ -1,0 +1,39 @@
+name: Compila APK Cassa Chiosco
+
+on:
+  push:
+  branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonare il repository
+        uses: actions/checkout@v4
+
+      - name: Impostare Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installare dipendenze di sistema e Buildozer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk python3-pip \
+            autoconf libtool pkg-config zlib1g-dev libncurses5-dev \
+            libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          pip install --upgrade pip
+          pip install --user --upgrade buildozer cython
+
+      - name: Compilare l'APK con Buildozer
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          buildozer -v android debug
+
+      - name: Salvare l'APK come risorsa scaricabile
+        uses: actions/upload-artifact@v4
+        with:
+          name: cassa-chiosco-apk
+          path: bin/*.apk
