@@ -1,8 +1,8 @@
-name: Compila APK Cassa Chiosco
+name: Risparmio per build cloud
 
 on:
   push:
-  branches: [ main, master ]
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -26,13 +26,15 @@ jobs:
             libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install --user --upgrade buildozer cython
+          # Aggiunge la cartella bin locale dell'utente al PATH di GitHub Actions
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Compilare l'APK con Buildozer
         run: |
-          export PATH=$HOME/.local/bin:$PATH
+          export PATH="$HOME/.local/bin:$PATH"
           buildozer -v android debug
 
-      - name: Salvare l'APK come risorsa scaricabile
+      - name: Caricare l'APK come Artefatto
         uses: actions/upload-artifact@v4
         with:
           name: cassa-chiosco-apk
