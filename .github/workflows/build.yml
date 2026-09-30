@@ -34,20 +34,28 @@ jobs:
             libreadline-dev \
             libssl-dev \
             libffi-dev \
-            libbz2-dev
+            libbz2-dev \
+            build-essential
 
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install --user cython==0.29.36 buildozer
 
+      - name: Clean Build Cache
+        run: |
+          rm -rf .buildozer bin/
+
       - name: Build APK with Buildozer
         env:
           BUILDER_SET_VERSION: "1"
-          # Rimuove i conflitti forzando l'ambiente a lasciare che sia Buildozer a gestire NDK/SDK
+          # Completely wipe out host-preinstalled NDK variables that cause toolchain mismatch conflicts
           ANDROID_NDK: ""
           ANDROID_NDK_HOME: ""
           ANDROIDNDK: ""
+          ANDROID_NDK_ROOT: ""
+          ANDROID_HOME: "/home/runner/android-sdk"
+          ANDROID_SDK_ROOT: "/home/runner/android-sdk"
         run: |
           echo y | ~/.local/bin/buildozer -v android debug
 
