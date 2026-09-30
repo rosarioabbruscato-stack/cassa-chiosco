@@ -37,6 +37,8 @@ jobs:
           ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          # Rimuoviamo la cartella r28c se viene scaricata o creata in automatico, bloccandone l'uso
+          rm -rf /home/runner/.buildozer/android/platform/android-ndk-r28c
           export ANDROID_NDK_HOME="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROID_NDK_ROOT="/home/runner/.buildozer/android/platform/android-ndk-r25b"
           export ANDROIDNDK="/home/runner/.buildozer/android/platform/android-ndk-r25b"
