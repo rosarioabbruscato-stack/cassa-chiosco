@@ -57,38 +57,48 @@ class CassaApp(App):
             self.content_container.add_widget(self.crea_schermata_storico())
 
     def crea_schermata_vendita(self):
-        layout = BoxLayout(orientation='horizontal', padding=10, spacing=10)
+        layout = BoxLayout(orientation='horizontal', padding=15, spacing=15)
         
-        # Sezione Sinistra: Scontrino e Totali
-        left_box = BoxLayout(orientation='vertical', spacing=8, size_hint_x=0.45)
+        # Sezione Sinistra: Scontrino e Totali (Occupa il 40% dello schermo)
+        left_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.40)
         
-        self.scontrino_label = Label(text="Scontrino Vuoto", font_size='14sp', halign='left', valign='top', size_hint_y=0.5)
-        self.scontrino_label.bind(size=self.scontrino_label.setter('text_size'))
-        left_box.add_widget(self.scontrino_label)
+        # Scontrino inserito in un ScrollView per evitare il taglio del testo se lungo
+        scroll_scontrino = ScrollView(size_hint_y=0.45)
+        self.scontrino_label = Label(
+            text="Scontrino Vuoto", 
+            font_size='14sp', 
+            halign='left', 
+            valign='top',
+            size_hint_y=None
+        )
+        self.scontrino_label.bind(width=lambda *x: setattr(self.scontrino_label, 'text_size', (self.scontrino_label.width, None)))
+        self.scontrino_label.bind(texture_size=lambda *x: setattr(self.scontrino_label, 'height', self.scontrino_label.texture_size[1]))
+        scroll_scontrino.add_widget(self.scontrino_label)
+        left_box.add_widget(scroll_scontrino)
         
         # Totale e Resto
-        tot_box = BoxLayout(orientation='vertical', size_hint_y=0.25, padding=5)
-        self.lbl_totale = Label(text="TOTALE: CHF 0.00", font_size='20sp', bold=True, halign='right')
-        self.lbl_resto = Label(text="RESTO: CHF 0.00", font_size='15sp', color=(1, 0.3, 0.3, 1), halign='right')
+        tot_box = BoxLayout(orientation='vertical', size_hint_y=0.20, padding=5, spacing=5)
+        self.lbl_totale = Label(text="TOTALE: CHF 0.00", font_size='22sp', bold=True, halign='right')
+        self.lbl_resto = Label(text="RESTO: CHF 0.00", font_size='16sp', color=(1, 0.3, 0.3, 1), halign='right')
         tot_box.add_widget(self.lbl_totale)
         tot_box.add_widget(self.lbl_resto)
         left_box.add_widget(tot_box)
         
         # Moneta ricevuta
         moneta_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=45, spacing=5)
-        moneta_box.add_widget(Label(text="Moneta CHF:", size_hint_x=0.5))
+        moneta_box.add_widget(Label(text="Moneta CHF:", size_hint_x=0.4, font_size='14sp'))
         self.input_moneta = TextInput(text="", multiline=False, font_size='16sp', input_filter='float')
         self.input_moneta.bind(text=self.aggiorna_resto)
         moneta_box.add_widget(self.input_moneta)
         left_box.add_widget(moneta_box)
         
-        # Pulsanti Pagamento
-        pay_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=50, spacing=5)
-        btn_carta = Button(text="CARTA", background_color=(0.1, 0.4, 0.7, 1))
+        # Pulsanti Pagamento ben visibili in basso a sinistra
+        pay_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=55, spacing=8)
+        btn_carta = Button(text="CARTA", background_color=(0.1, 0.4, 0.7, 1), font_size='15sp', bold=True)
         btn_carta.bind(on_press=lambda x: self.completa_vendita("CARTA"))
-        btn_twint = Button(text="TWINT", background_color=(0.1, 0.6, 0.2, 1))
+        btn_twint = Button(text="TWINT", background_color=(0.1, 0.6, 0.2, 1), font_size='15sp', bold=True)
         btn_twint.bind(on_press=lambda x: self.completa_vendita("TWINT"))
-        btn_cash = Button(text="CASH", background_color=(0.9, 0.6, 0.1, 1))
+        btn_cash = Button(text="CASH", background_color=(0.9, 0.6, 0.1, 1), font_size='15sp', bold=True)
         btn_cash.bind(on_press=lambda x: self.completa_vendita("CASH"))
         pay_box.add_widget(btn_carta)
         pay_box.add_widget(btn_twint)
@@ -97,17 +107,24 @@ class CassaApp(App):
         
         layout.add_widget(left_box)
         
-        # Sezione Destra: Tastierino e Ricerca Barcode nel DB reale
-        right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.55)
+        # Sezione Destra: Tastierino e Ricerca Barcode (Occupa il 60% dello schermo)
+        right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.60)
         
-        self.input_codice = TextInput(text="", hint_text="Digita Barcode o Nome Prodotto", multiline=False, size_hint_y=None, height=50, font_size='18sp')
+        self.input_codice = TextInput(
+            text="", 
+            hint_text="Digita Barcode o Nome Prodotto", 
+            multiline=False, 
+            size_hint_y=None, 
+            height=50, 
+            font_size='18sp'
+        )
         right_box.add_widget(self.input_codice)
         
-        # Tastierino Numerico
-        grid_tasti = GridLayout(cols=4, spacing=5)
+        # Tastierino Numerico proporzionato
+        grid_tasti = GridLayout(cols=4, spacing=6)
         tasti = ['1', '2', '3', 'QTA', '4', '5', '6', 'PREZZO', '7', '8', '9', 'C', '0', ',', '⌫', 'CERCA / AGGIUNGI']
         for t in tasti:
-            btn = Button(text=t, font_size='15sp')
+            btn = Button(text=t, font_size='16sp', bold=True)
             btn.bind(on_press=lambda instance, val=t: self.premi_tasto(val))
             grid_tasti.add_widget(btn)
         right_box.add_widget(grid_tasti)
@@ -133,7 +150,6 @@ class CassaApp(App):
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         
-        # Cerca per barcode esatto o per nome (tramite LIKE nel database reale)
         cursor.execute("SELECT nome, prezzo FROM prodotti WHERE barcode = ? OR nome LIKE ?", (query, f"%{query}%"))
         risultato = cursor.fetchone()
         conn.close()
@@ -144,7 +160,6 @@ class CassaApp(App):
             self.scontrino_righe.append(riga)
             self.totale_generale += float(prezzo)
         else:
-            # Se non trovato nel DB, permette l'inserimento manuale rapido dell'importo digitato
             try:
                 importo = float(query.replace(',', '.'))
                 riga = f"Articolo libero{'':<11} CHF {importo:.2f}"
