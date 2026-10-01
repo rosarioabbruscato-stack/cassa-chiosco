@@ -56,7 +56,7 @@ requirements = python3,kivy,pyjnius
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse, landscape-reverse, or all
-orientation = portrait
+orientation = landscape
 
 # (list) List of services to declare
 # This is currently only relevant to Android services.
@@ -250,7 +250,7 @@ android.accept_sdk_license = True
 
 # (str) screenOrientation to set for the main activity.
 # Valid values can be found at https://developer.android.com/guide/topics/manifest/activity-element
-#android.manifest.orientation = fullSensor
+#android.manifest.orientation = landscape
 
 # (list) Android additional libraries to copy into libs/armeabi
 #android.add_libs_armeabi = libs/android/*.so
