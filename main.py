@@ -14,13 +14,12 @@ class CassaApp(App):
         self.reparto_selezionato = "GENERALE"
         self.moltiplicatore_qta = 1
         self.prezzo_forzato = None
-        self.valuta_corrente = "CHF"  # Valuta fissa in CHF
+        self.valuta_corrente = "CHF"
         self.vendita_completata_flag = False
         self.title = "Cassa - Chiosco & Alimentari dell'Est"
         
         self.root_layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
         
-        # Menu superiore importato dal modulo ui_cassa
         nav_layout = InterfacciaCassa.crea_menu_superiore(self)
         self.root_layout.add_widget(nav_layout)
         
@@ -165,7 +164,6 @@ class CassaApp(App):
         conn.commit()
         conn.close()
         
-        # Invocazione modulo di stampa termica (blocco predisposto)
         self.esegui_stampa_termica(dettagli, self.totale_generale, pagamento)
         
         self.vendita_completata_flag = True
@@ -183,13 +181,10 @@ class CassaApp(App):
         self.btn_azione_scontrino.text = "Elimina Riga Selezionata"
         self.btn_azione_scontrino.set_color((0.9, 0.25, 0.25, 1))
 
-    # --- BLOCCHI DI ESPANSIONE FUTURI ---
     def esegui_stampa_termica(self, dettagli, totale, pagamento):
-        """Modulo Stampa Termica"""
         pass
 
     def esegui_chiusura_z(self, *args):
-        """Modulo Chiusura Z"""
         self.lbl_stato_corrente.text = "Chiusura Z calcolata e registrata con successo!"
 
 if __name__ == '__main__':
