@@ -47,6 +47,7 @@ class CassaApp(App):
         self.moltiplicatore_qta = 1
         self.prezzo_forzato = None
         self.valuta_corrente = "CHF"
+        self.vendita_completata_flag = False
         self.title = "Cassa - Chiosco & Alimentari dell'Est"
         
         self.root_layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
@@ -102,9 +103,9 @@ class CassaApp(App):
         lbl_scontrino_title.bind(size=lbl_scontrino_title.setter('text_size'))
         top_scontrino_bar.add_widget(lbl_scontrino_title)
         
-        self.btn_valuta = CustomButton(text=f"Valuta: {self.valuta_corrente}", bg_color=(0.15, 0.5, 0.85, 1), size_hint_x=None, width=105, bold=True, font_size='13sp')
-        self.btn_valuta.bind(on_press=self.cambia_valuta)
-        top_scontrino_bar.add_widget(self.btn_valuta)
+        # Etichetta fissa Valuta CHF (senza pulsante di cambio)
+        lbl_valuta_fissa = Label(text=f"Valuta: {self.valuta_corrente}", font_size='13sp', bold=True, color=(0.15, 0.45, 0.85, 1), size_hint_x=None, width=105)
+        top_scontrino_bar.add_widget(lbl_valuta_fissa)
         left_box.add_widget(top_scontrino_bar)
         
         scroll_scontrino = ScrollView()
@@ -114,9 +115,10 @@ class CassaApp(App):
         scroll_scontrino.add_widget(self.scontrino_label)
         left_box.add_widget(scroll_scontrino)
         
-        btn_elimina_riga = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=42, bold=True, font_size='13sp')
-        btn_elimina_riga.bind(on_press=self.elimina_ultima_riga)
-        left_box.add_widget(btn_elimina_riga)
+        # Pulsante dinamico: Elimina riga oppure Nuova Operazione se la vendita è completata
+        self.btn_azione_scontrino = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=42, bold=True, font_size='13sp')
+        self.btn_azione_scontrino.bind(on_press=self.gestisci_azione_scontrino)
+        left_box.add_widget(self.btn_azione_scontrino)
         
         tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=85, spacing=4)
         self.lbl_totale = Label(text=f"TOTALE: {self.valuta_corrente} 0.00", font_size='21sp', bold=True, halign='right', color=(0.1, 0.1, 0.1, 1))
@@ -159,7 +161,7 @@ class CassaApp(App):
         left_box.add_widget(pay_box)
         layout.add_widget(left_box)
         
-        # Colonna di destra (Reparti e Tastierino proporzionati ed espansi)
+        # Colonna di destra (Reparti e Tastierino con proporzioni ideali)
         right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.58)
         self.input_codice = TextInput(text="", hint_text="Input / Tastierino / Barcode", multiline=False, size_hint_y=None, height=46, font_size='16sp')
         right_box.add_widget(self.input_codice)
@@ -170,7 +172,6 @@ class CassaApp(App):
         lbl_seq_guida = Label(text="Reparti Rapidi (Sequenza: Clicca Reparto -> Numero -> Q.tà -> Numero -> Prezzo/Conferma)", size_hint_y=None, height=18, font_size='10sp', color=(0.4, 0.4, 0.4, 1))
         right_box.add_widget(lbl_seq_guida)
         
-        # Reparti con altezza flessibile per occupare lo spazio ideale
         reparti_grid = GridLayout(cols=4, spacing=8, size_hint_y=None, height=110)
         reparti = ["ALIMENTARI", "BIBITE", "CUCINA", "LOTTO", "LOTTO VINCITE", "NON ALIMENTARI", "SIGARETTE"]
         colori_reparti = {
@@ -186,7 +187,6 @@ class CassaApp(App):
         reparti_grid.add_widget(CustomButton(text="", disabled=True, bg_color=(0,0,0,0)))
         right_box.add_widget(reparti_grid)
         
-        # Tastierino numerico e azioni che si espandono per riempire perfettamente lo spazio verticale rimanente
         tastierino_layout = BoxLayout(orientation='horizontal', spacing=10)
         
         grid_tasti = GridLayout(cols=3, spacing=8, size_hint_x=0.72)
@@ -196,7 +196,7 @@ class CassaApp(App):
             grid_tasti.add_widget(btn)
         tastierino_layout.add_widget(grid_tasti)
         
-        # Colonna azioni (Q.tà, Prezzo, Conferma) con pulsanti grandi e ben proporzionati
+        # Colonna azioni con colori ben definiti e proporzioni perfette
         col_azioni = BoxLayout(orientation='vertical', spacing=8, size_hint_x=0.28)
         
         btn_qta = CustomButton(text="Q.tà", bg_color=(0.95, 0.55, 0.1, 1), font_size='15sp', bold=True)
@@ -217,16 +217,15 @@ class CassaApp(App):
         layout.add_widget(right_box)
         return layout
 
-    def cambia_valuta(self, *args):
-        self.valuta_corrente = "EUR" if self.valuta_corrente == "CHF" else "CHF"
-        self.btn_valuta.text = f"Valuta: {self.valuta_corrente}"
-        self.aggiorna_vista_scontrino()
-
     def seleziona_reparto(self, reparto):
+        if self.vendita_completata_flag:
+            return
         self.reparto_selezionato = reparto
         self.lbl_stato_corrente.text = f"Reparto Selezionato: {reparto}"
 
     def imposta_modalita(self, modo):
+        if self.vendita_completata_flag:
+            return
         valore = self.input_codice.text.strip()
         if modo == "QTA":
             try:
@@ -244,12 +243,16 @@ class CassaApp(App):
             self.input_codice.text = ""
 
     def premi_tasto(self, valore):
+        if self.vendita_completata_flag:
+            return
         if valore == '⌫':
             self.input_codice.text = self.input_codice.text[:-1]
         else:
             self.input_codice.text += valore
 
     def cerca_e_aggiungi_prodotto(self):
+        if self.vendita_completata_flag:
+            return
         query = self.input_codice.text.strip()
         if self.prezzo_forzato is not None:
             prezzo_unitario = self.prezzo_forzato
@@ -289,6 +292,12 @@ class CassaApp(App):
         self.aggiorna_vista_scontrino()
         self.input_codice.text = ""
 
+    def gestisci_azione_scontrino(self, *args):
+        if self.vendita_completata_flag:
+            self.nuova_operazione()
+        else:
+            self.elimina_ultima_riga()
+
     def elimina_ultima_riga(self, *args):
         if self.scontrino_righe:
             riga, prezzo = self.scontrino_righe.pop()
@@ -313,7 +322,7 @@ class CassaApp(App):
             self.lbl_resto.text = "Resto: -"
 
     def completa_vendita(self, pagamento):
-        if not self.scontrino_righe:
+        if not self.scontrino_righe or self.vendita_completata_flag:
             return
         data_ora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         dettagli = " | ".join([r[0] for r in self.scontrino_righe])
@@ -323,10 +332,24 @@ class CassaApp(App):
                        (data_ora, self.totale_generale, dettagli, pagamento, self.cassa_corrente, self.operatore_corrente))
         conn.commit()
         conn.close()
+        
+        # Segnamo che la vendita è completata ma lasciamo lo scontrino visibile per il controllo
+        self.vendita_completata_flag = True
+        self.lbl_stato_corrente.text = f"Vendita completata ({pagamento}) - Scontrino in verifica"
+        
+        # Trasformiamo il pulsante inferiore in "Nuova Operazione"
+        self.btn_azione_scontrino.text = "NUOVA OPERAZIONE"
+        self.btn_azione_scontrino.set_color((0.1, 0.5, 0.8, 1))
+
+    def nuova_operazione(self):
         self.scontrino_righe = []
         self.totale_generale = 0.0
+        self.vendita_completata_flag = False
+        self.input_moneta.text = ""
         self.aggiorna_vista_scontrino()
-        self.lbl_stato_corrente.text = f"Vendita completata ({pagamento}) con successo!"
+        self.lbl_stato_corrente.text = "Pronto per nuova vendita"
+        self.btn_azione_scontrino.text = "Elimina Riga Selezionata"
+        self.btn_azione_scontrino.set_color((0.9, 0.25, 0.25, 1))
 
     def crea_schermata_magazzino(self):
         layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
