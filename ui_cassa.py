@@ -31,15 +31,6 @@ class InterfacciaCassa:
         
         # --- COLONNA DI SINISTRA ---
         left_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.42)
-        top_scontrino_bar = BoxLayout(orientation='horizontal', size_hint_y=None, height=38, spacing=8)
-        
-        lbl_scontrino_title = Label(text="Scontrino Corrente", font_size='13sp', bold=True, halign='left', color=(0.15, 0.15, 0.15, 1))
-        lbl_scontrino_title.bind(size=lbl_scontrino_title.setter('text_size'))
-        top_scontrino_bar.add_widget(lbl_scontrino_title)
-        
-        lbl_valuta_fissa = Label(text=f"Valuta: {app_instance.valuta_corrente}", font_size='13sp', bold=True, color=(0.15, 0.45, 0.85, 1), size_hint_x=None, width=105)
-        top_scontrino_bar.add_widget(lbl_valuta_fissa)
-        left_box.add_widget(top_scontrino_bar)
         
         scroll_scontrino = ScrollView()
         app_instance.scontrino_label = Label(text="Scontrino Vuoto", font_size='13sp', halign='left', valign='top', size_hint_y=None, color=(0.2, 0.2, 0.2, 1))
@@ -48,23 +39,23 @@ class InterfacciaCassa:
         scroll_scontrino.add_widget(app_instance.scontrino_label)
         left_box.add_widget(scroll_scontrino)
         
-        app_instance.btn_azione_scontrino = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=38, bold=True, font_size='13sp')
+        app_instance.btn_azione_scontrino = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=25, bold=True, font_size='13sp')
         app_instance.btn_azione_scontrino.bind(on_press=app_instance.gestisci_azione_scontrino)
         left_box.add_widget(app_instance.btn_azione_scontrino)
         
-        tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=50, spacing=2)
-        app_instance.lbl_totale = Label(text=f"TOTALE: {app_instance.valuta_corrente} 0.00", font_size='18sp', bold=True, halign='right', color=(0.1, 0.1, 0.1, 1))
+        tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=30, spacing=2)
+        app_instance.lbl_totale = Label(text=f"TOTALE: {app_instance.valuta_corrente} 0.00", font_size='14sp', bold=True, halign='right', color=(0.1, 0.1, 0.1, 1))
         app_instance.lbl_totale.bind(size=app_instance.lbl_totale.setter('text_size'))
         
-        app_instance.lbl_resto = Label(text="Resto: -", font_size='14sp', color=(0.1, 0.65, 0.3, 1), halign='right', bold=True)
+        app_instance.lbl_resto = Label(text="Resto: -", font_size='12sp', color=(0.1, 0.65, 0.3, 1), halign='right', bold=True)
         app_instance.lbl_resto.bind(size=app_instance.lbl_resto.setter('text_size'))
         
         tot_box.add_widget(app_instance.lbl_totale)
         tot_box.add_widget(app_instance.lbl_resto)
         left_box.add_widget(tot_box)
         
-        moneta_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=36, spacing=10)
-        lbl_ricevuto = Label(text="Importo Ricevuto:", size_hint_x=0.5, font_size='13sp', color=(0.2, 0.2, 0.2, 1), halign='left')
+        moneta_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=25, spacing=10)
+        lbl_ricevuto = Label(text="Importo Ricevuto:", size_hint_x=0.5, font_size='12sp', color=(0.2, 0.2, 0.2, 1), halign='left')
         lbl_ricevuto.bind(size=lbl_ricevuto.setter('text_size'))
         moneta_box.add_widget(lbl_ricevuto)
         
