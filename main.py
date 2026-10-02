@@ -49,10 +49,10 @@ class CassaApp(App):
         self.valuta_corrente = "CHF"
         self.title = "Cassa - Chiosco & Alimentari dell'Est"
         
-        self.root_layout = BoxLayout(orientation='vertical', padding=20, spacing=16)
+        self.root_layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
         
         # Menu superiore
-        nav_layout = BoxLayout(size_hint_y=None, height=55, padding=0, spacing=12)
+        nav_layout = BoxLayout(size_hint_y=None, height=52, padding=0, spacing=10)
         btn_vendita = CustomButton(text="Cassa / Vendita", bg_color=(0.3, 0.15, 0.7, 1), bold=True, font_size='14sp')
         btn_vendita.bind(on_press=lambda x: self.mostra_schermata("vendita"))
         
@@ -92,33 +92,33 @@ class CassaApp(App):
             self.content_container.add_widget(self.crea_schermata_storico())
 
     def crea_schermata_vendita(self):
-        layout = BoxLayout(orientation='horizontal', padding=0, spacing=24)
+        layout = BoxLayout(orientation='horizontal', padding=0, spacing=20)
         
         # Colonna di sinistra (Scontrino e Pagamenti)
-        left_box = BoxLayout(orientation='vertical', spacing=12, size_hint_x=0.42)
-        top_scontrino_bar = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=8)
+        left_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.42)
+        top_scontrino_bar = BoxLayout(orientation='horizontal', size_hint_y=None, height=38, spacing=8)
         
         lbl_scontrino_title = Label(text="Scontrino Corrente", font_size='13sp', bold=True, halign='left', color=(0.15, 0.15, 0.15, 1))
         lbl_scontrino_title.bind(size=lbl_scontrino_title.setter('text_size'))
         top_scontrino_bar.add_widget(lbl_scontrino_title)
         
-        self.btn_valuta = CustomButton(text=f"Valuta: {self.valuta_corrente}", bg_color=(0.15, 0.5, 0.85, 1), size_hint_x=None, width=110, bold=True, font_size='13sp')
+        self.btn_valuta = CustomButton(text=f"Valuta: {self.valuta_corrente}", bg_color=(0.15, 0.5, 0.85, 1), size_hint_x=None, width=105, bold=True, font_size='13sp')
         self.btn_valuta.bind(on_press=self.cambia_valuta)
         top_scontrino_bar.add_widget(self.btn_valuta)
         left_box.add_widget(top_scontrino_bar)
         
-        scroll_scontrino = ScrollView(size_hint_y=0.40)
+        scroll_scontrino = ScrollView()
         self.scontrino_label = Label(text="Scontrino Vuoto", font_size='13sp', halign='left', valign='top', size_hint_y=None, color=(0.2, 0.2, 0.2, 1))
         self.scontrino_label.bind(width=lambda *x: setattr(self.scontrino_label, 'text_size', (self.scontrino_label.width, None)))
         self.scontrino_label.bind(texture_size=lambda *x: setattr(self.scontrino_label, 'height', self.scontrino_label.texture_size[1]))
         scroll_scontrino.add_widget(self.scontrino_label)
         left_box.add_widget(scroll_scontrino)
         
-        btn_elimina_riga = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=44, bold=True, font_size='13sp')
+        btn_elimina_riga = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=42, bold=True, font_size='13sp')
         btn_elimina_riga.bind(on_press=self.elimina_ultima_riga)
         left_box.add_widget(btn_elimina_riga)
         
-        tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=90, spacing=4)
+        tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=85, spacing=4)
         self.lbl_totale = Label(text=f"TOTALE: {self.valuta_corrente} 0.00", font_size='21sp', bold=True, halign='right', color=(0.1, 0.1, 0.1, 1))
         self.lbl_totale.bind(size=self.lbl_totale.setter('text_size'))
         
@@ -129,7 +129,7 @@ class CassaApp(App):
         tot_box.add_widget(self.lbl_resto)
         left_box.add_widget(tot_box)
         
-        moneta_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=44, spacing=10)
+        moneta_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=42, spacing=10)
         lbl_ricevuto = Label(text="Importo Ricevuto:", size_hint_x=0.5, font_size='13sp', color=(0.2, 0.2, 0.2, 1), halign='left')
         lbl_ricevuto.bind(size=lbl_ricevuto.setter('text_size'))
         moneta_box.add_widget(lbl_ricevuto)
@@ -139,11 +139,11 @@ class CassaApp(App):
         moneta_box.add_widget(self.input_moneta)
         left_box.add_widget(moneta_box)
         
-        lbl_pagamento = Label(text="Seleziona Pagamento:", size_hint_y=None, height=22, font_size='12sp', color=(0.2, 0.2, 0.2, 1), halign='left')
+        lbl_pagamento = Label(text="Seleziona Pagamento:", size_hint_y=None, height=20, font_size='12sp', color=(0.2, 0.2, 0.2, 1), halign='left')
         lbl_pagamento.bind(size=lbl_pagamento.setter('text_size'))
         left_box.add_widget(lbl_pagamento)
         
-        pay_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=50, spacing=10)
+        pay_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=48, spacing=10)
         btn_carta = CustomButton(text="CARTA", bg_color=(0.15, 0.45, 0.9, 1), font_size='13sp', bold=True)
         btn_carta.bind(on_press=lambda x: self.completa_vendita("CARTA"))
         
@@ -159,18 +159,19 @@ class CassaApp(App):
         left_box.add_widget(pay_box)
         layout.add_widget(left_box)
         
-        # Colonna di destra (Reparti e Tastierino con azioni ben differenziate)
+        # Colonna di destra (Reparti e Tastierino proporzionati ed espansi)
         right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.58)
-        self.input_codice = TextInput(text="", hint_text="Input / Tastierino / Barcode", multiline=False, size_hint_y=None, height=48, font_size='16sp')
+        self.input_codice = TextInput(text="", hint_text="Input / Tastierino / Barcode", multiline=False, size_hint_y=None, height=46, font_size='16sp')
         right_box.add_widget(self.input_codice)
         
-        self.lbl_stato_corrente = Label(text="Pronto: Clicca un Reparto, inserisci quantità/prezzo e conferma", size_hint_y=None, height=24, font_size='12sp', color=(0.15, 0.45, 0.8, 1), bold=True)
+        self.lbl_stato_corrente = Label(text="Pronto: Clicca un Reparto, inserisci quantità/prezzo e conferma", size_hint_y=None, height=22, font_size='12sp', color=(0.15, 0.45, 0.8, 1), bold=True)
         right_box.add_widget(self.lbl_stato_corrente)
         
-        lbl_seq_guida = Label(text="Reparti Rapidi (Sequenza: Clicca Reparto -> Numero -> Q.tà -> Numero -> Prezzo/Conferma)", size_hint_y=None, height=20, font_size='10sp', color=(0.4, 0.4, 0.4, 1))
+        lbl_seq_guida = Label(text="Reparti Rapidi (Sequenza: Clicca Reparto -> Numero -> Q.tà -> Numero -> Prezzo/Conferma)", size_hint_y=None, height=18, font_size='10sp', color=(0.4, 0.4, 0.4, 1))
         right_box.add_widget(lbl_seq_guida)
         
-        reparti_grid = GridLayout(cols=4, spacing=8, size_hint_y=None, height=105)
+        # Reparti con altezza flessibile per occupare lo spazio ideale
+        reparti_grid = GridLayout(cols=4, spacing=8, size_hint_y=None, height=110)
         reparti = ["ALIMENTARI", "BIBITE", "CUCINA", "LOTTO", "LOTTO VINCITE", "NON ALIMENTARI", "SIGARETTE"]
         colori_reparti = {
             "ALIMENTARI": (1.0, 0.6, 0.15, 1), "BIBITE": (1.0, 0.8, 0.2, 1),
@@ -185,33 +186,33 @@ class CassaApp(App):
         reparti_grid.add_widget(CustomButton(text="", disabled=True, bg_color=(0,0,0,0)))
         right_box.add_widget(reparti_grid)
         
-        tastierino_layout = BoxLayout(orientation='horizontal', spacing=10, size_hint_y=None, height=230)
+        # Tastierino numerico e azioni che si espandono per riempire perfettamente lo spazio verticale rimanente
+        tastierino_layout = BoxLayout(orientation='horizontal', spacing=10)
+        
         grid_tasti = GridLayout(cols=3, spacing=8, size_hint_x=0.72)
         for t in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ',', '⌫']:
-            btn = CustomButton(text=t, bg_color=(1, 1, 1, 1), color=(0.1, 0.1, 0.1, 1), font_size='18sp', bold=True)
+            btn = CustomButton(text=t, bg_color=(1, 1, 1, 1), color=(0.1, 0.1, 0.1, 1), font_size='22sp', bold=True)
             btn.bind(on_press=lambda instance, val=t: self.premi_tasto(val))
             grid_tasti.add_widget(btn)
         tastierino_layout.add_widget(grid_tasti)
         
-        # Colonna azioni con colori ben differenziati
+        # Colonna azioni (Q.tà, Prezzo, Conferma) con pulsanti grandi e ben proporzionati
         col_azioni = BoxLayout(orientation='vertical', spacing=8, size_hint_x=0.28)
         
-        # Q.tà -> Arancione caldo / Ambra
-        btn_qta = CustomButton(text="Q.tà", bg_color=(0.95, 0.55, 0.1, 1), font_size='14sp', bold=True)
+        btn_qta = CustomButton(text="Q.tà", bg_color=(0.95, 0.55, 0.1, 1), font_size='15sp', bold=True)
         btn_qta.bind(on_press=lambda x: self.imposta_modalita("QTA"))
         
-        # Prezzo -> Blu oceano
-        btn_prezzo = CustomButton(text="Prezzo", bg_color=(0.15, 0.5, 0.9, 1), font_size='14sp', bold=True)
+        btn_prezzo = CustomButton(text="Prezzo", bg_color=(0.15, 0.5, 0.9, 1), font_size='15sp', bold=True)
         btn_prezzo.bind(on_press=lambda x: self.imposta_modalita("PREZZO"))
         
-        # CONFERMA -> Verde brillante
-        btn_conferma = CustomButton(text="CONFERMA", bg_color=(0.1, 0.7, 0.3, 1), font_size='13sp', bold=True)
+        btn_conferma = CustomButton(text="CONFERMA", bg_color=(0.1, 0.7, 0.3, 1), font_size='14sp', bold=True)
         btn_conferma.bind(on_press=lambda x: self.cerca_e_aggiungi_prodotto())
         
         col_azioni.add_widget(btn_qta)
         col_azioni.add_widget(btn_prezzo)
         col_azioni.add_widget(btn_conferma)
         tastierino_layout.add_widget(col_azioni)
+        
         right_box.add_widget(tastierino_layout)
         layout.add_widget(right_box)
         return layout
