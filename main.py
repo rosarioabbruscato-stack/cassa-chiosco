@@ -9,11 +9,11 @@ Config.set('graphics', 'resizable', True)
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from ui_cassa import InterfacciaCassa
+from ui.ui_cassa import InterfacciaCassa
 
 class CassaApp(App):
     def build(self):
-        self.db_name = "negozio.db"
+        self.db_name = "database/negozio.db"
         self.operatore_corrente = "Rosario Vincenzo"
         self.cassa_corrente = "Cassa Mobile Android"
         self.scontrino_righe = []

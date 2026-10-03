@@ -1,10 +1,11 @@
+from ui.ui_magazzino import InterfacciaMagazzino
 import sqlite3
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
-from styles import CustomButton, COLORI_REPARTI
+from ui.ui_styles import CustomButton, COLORI_REPARTI
 
 class InterfacciaCassa:
     @staticmethod
@@ -136,35 +137,7 @@ class InterfacciaCassa:
 
     @staticmethod
     def crea_schermata_magazzino(app_instance):
-        layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
-        lbl_titolo = Label(text="Gestione Magazzino & Articoli", font_size='18sp', size_hint_y=None, height=40, color=(0.1, 0.1, 0.1, 1), bold=True)
-        lbl_titolo.bind(size=lbl_titolo.setter('text_size'))
-        layout.add_widget(lbl_titolo)
-        
-        scroll = ScrollView()
-        box_prodotti = BoxLayout(orientation='vertical', size_hint_y=None, spacing=8)
-        box_prodotti.bind(minimum_height=box_prodotti.setter('height'))
-        
-        conn = sqlite3.connect(app_instance.db_name)
-        cursor = conn.cursor()
-        cursor.execute("SELECT barcode, nome, prezzo, giacenza FROM prodotti ORDER BY nome ASC")
-        rows = cursor.fetchall()
-        conn.close()
-        
-        if not rows:
-            lbl_vuoto = Label(text="Nessun prodotto in magazzino.", size_hint_y=None, height=40, color=(0.3, 0.3, 0.3, 1))
-            lbl_vuoto.bind(size=lbl_vuoto.setter('text_size'))
-            box_prodotti.add_widget(lbl_vuoto)
-        for b, n, p, g in rows:
-            lbl = Label(text=f"[{b}] {n} - {app_instance.valuta_corrente} {p:.2f} (Giac: {g})", size_hint_y=None, height=40, halign='left', color=(0.2, 0.2, 0.2, 1))
-            lbl.bind(size=lbl.setter('text_size'))
-            box_prodotti.add_widget(lbl)
-            
-        scroll.add_widget(box_prodotti)
-        layout.add_widget(scroll)
-        return layout
-
-    @staticmethod
+        return InterfacciaMagazzino()
     def crea_schermata_storico(app_instance):
         layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
         
