@@ -30,7 +30,7 @@ class InterfacciaCassa:
         layout = BoxLayout(orientation='horizontal', padding=0, spacing=20)
         
         # --- COLONNA DI SINISTRA ---
-        left_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.42)
+        left_box = BoxLayout(orientation='vertical', padding=15, spacing=10, size_hint_x=0.50)
         
         scroll_scontrino = ScrollView()
         app_instance.scontrino_label = Label(text="Scontrino Vuoto", font_size='13sp', halign='left', valign='top', size_hint_y=None, color=(0.2, 0.2, 0.2, 1))
@@ -85,7 +85,7 @@ class InterfacciaCassa:
         layout.add_widget(left_box)
         
         # --- COLONNA DI DESTRA (Reparti con font ridotto a 11sp) ---
-        right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.58)
+        right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.50)
         app_instance.input_codice = TextInput(text="", hint_text="Input / Tastierino / Barcode", multiline=False, size_hint_y=None, height=46, font_size='16sp')
         right_box.add_widget(app_instance.input_codice)
         
@@ -200,3 +200,5 @@ class InterfacciaCassa:
         scroll.add_widget(box_vendite)
         layout.add_widget(scroll)
         return layout
+
+

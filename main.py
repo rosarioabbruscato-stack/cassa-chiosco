@@ -1,5 +1,12 @@
 from datetime import datetime
 import sqlite3
+from kivy.config import Config
+
+# Imposta la risoluzione fissa della finestra per simulare il tablet
+Config.set('graphics', 'width', '1280')
+Config.set('graphics', 'height', '800')
+Config.set('graphics', 'resizable', True)
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from ui_cassa import InterfacciaCassa
