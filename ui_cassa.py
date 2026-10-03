@@ -39,11 +39,11 @@ class InterfacciaCassa:
         scroll_scontrino.add_widget(app_instance.scontrino_label)
         left_box.add_widget(scroll_scontrino)
         
-        app_instance.btn_azione_scontrino = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=25, bold=True, font_size='13sp')
+        app_instance.btn_azione_scontrino = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=31, bold=True, font_size='13sp')
         app_instance.btn_azione_scontrino.bind(on_press=app_instance.gestisci_azione_scontrino)
         left_box.add_widget(app_instance.btn_azione_scontrino)
         
-        tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=30, spacing=2)
+        tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=40, spacing=2)
         app_instance.lbl_totale = Label(text=f"TOTALE: {app_instance.valuta_corrente} 0.00", font_size='14sp', bold=True, halign='right', color=(0.1, 0.1, 0.1, 1))
         app_instance.lbl_totale.bind(size=app_instance.lbl_totale.setter('text_size'))
         
