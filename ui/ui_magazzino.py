@@ -518,19 +518,15 @@ class InterfacciaMagazzino(BoxLayout):
             self.mostra_popup('Errore', str(e))
 
     def importa_dati(self, instance):
-        from kivy.utils import platform
-from plyer import filechooser
-        from tkinter import filedialog
-        root = tk.Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
-        file_path = filedialog.askopenfilename(
-            title="Seleziona file Excel",
-            filetypes=[("Excel files", "*.xlsx *.xls")]
-        )
-        if file_path:
-            try:
-                importa_magazzino_excel(file_path)
-                print("Importazione completata con successo!")
-            except Exception as e:
-                print(f"Errore durante l importazione: {e}")
+    from kivy.utils import platform
+    if platform == 'android':
+        from plyer import filechooser
+        filechooser.open_file(on_selection=self._on_file_selected)
+    else:
+        import subprocess
+        try:
+            file_path = subprocess.check_output(['zenity', '--file-selection'], text=True).strip()
+            if file_path:
+                self._on_file_selected([file_path])
+        except Exception as e:
+            print(f"Errore nella selezione file: {e}")
