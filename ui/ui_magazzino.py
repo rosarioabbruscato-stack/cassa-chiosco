@@ -518,7 +518,8 @@ class InterfacciaMagazzino(BoxLayout):
             self.mostra_popup('Errore', str(e))
 
     def importa_dati(self, instance):
-        import tkinter as tk
+        from kivy.utils import platform
+from plyer import filechooser
         from tkinter import filedialog
         root = tk.Tk()
         root.withdraw()
