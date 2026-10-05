@@ -1,3 +1,4 @@
+import os
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
@@ -517,16 +518,18 @@ class InterfacciaMagazzino(BoxLayout):
             self.mostra_popup('Errore', str(e))
 
     def importa_dati(self, instance):
-        successo, msg = importa_magazzino_excel('export_magazzino.xlsx')
-        self.aggiorna_spinner_filtro()
-        self.aggiorna_lista_prodotti()
-        self.mostra_popup('Importazione', msg)
-
-    def mostra_popup(self, titolo, messaggio):
-        content = BoxLayout(orientation='vertical', padding=10, spacing=10)
-        content.add_widget(Label(text=messaggio))
-        btn_chiudi = Button(text='OK', size_hint_y=None, height=40)
-        popup = Popup(title=titolo, content=content, size_hint=(0.7, 0.3))
-        btn_chiudi.bind(on_press=popup.dismiss)
-        content.add_widget(btn_chiudi)
-        popup.open()
+        import tkinter as tk
+        from tkinter import filedialog
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        file_path = filedialog.askopenfilename(
+            title="Seleziona file Excel",
+            filetypes=[("Excel files", "*.xlsx *.xls")]
+        )
+        if file_path:
+            try:
+                importa_magazzino_excel(file_path)
+                print("Importazione completata con successo!")
+            except Exception as e:
+                print(f"Errore durante l importazione: {e}")
