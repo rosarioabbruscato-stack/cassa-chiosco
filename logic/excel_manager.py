@@ -3,32 +3,19 @@ import sqlite3
 import openpyxl
 import glob
 
-DB_PATH = "database/negozio.db"
-
-def esporta_magazzino_excel(file_path="export_magazzino.xlsx"):
-    """Esporta tutti i prodotti dal database SQLite in un file Excel usando openpyxl."""
-    try:
-        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        # --- CONTROLLO E AGGIUNTA AUTOMATICA DELLA COLONNA ---
-        cursor.execute("PRAGMA table_info(prodotti);")
-        colonne = [info[1] for info in cursor.fetchall()]
-        if colonne and 'codice_barra' not in colonne:
-            cursor.execute("ALTER TABLE prodotti ADD COLUMN codice_barra TEXT;")
-            conn.commit()
-        # ----------------------------------------------------
-
-        cursor.execute("SELECT id, codice_barra, nome, prezzo, giacenza FROM prodotti")
-        rows = cursor.fetchall()
-        column_names = [description[0] for description in cursor.description]
-
-        conn.close()
+def verifica_e_aggiorna_db(db_path):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    # Verifica le colonne esistenti nella tabella prodotti
+    cursor.execute("PRAGMA table_info(prodotti)")
+    colonne = [col[1] for col in cursor.fetchall()]
+    
+    # Se la tabella esiste ma manca codice_barra, la aggiungiamo
+    if colonne and 'codice_barra' not in colonne:
+        cursor.execute("ALTER TABLE prodotti ADD COLUMN codice_barra TEXT")
+        conn.commit()
+    conn.close()
         
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Magazzino"
         
         ws.append(column_names)
         for row in rows:
@@ -68,4 +55,5 @@ def importa_magazzino_excel(file_path=None):
         return True, "Importazione completata con successo!"
     except Exception as e:
         return False, str(e)
+
 
