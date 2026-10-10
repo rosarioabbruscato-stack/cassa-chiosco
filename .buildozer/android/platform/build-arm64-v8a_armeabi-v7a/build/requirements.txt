@@ -1,0 +1,7 @@
+certifi
+chardet
+idna
+openpyxl
+plyer
+requests
+urllib3
