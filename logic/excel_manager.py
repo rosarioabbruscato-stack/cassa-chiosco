@@ -11,11 +11,19 @@ def esporta_magazzino_excel(file_path="export_magazzino.xlsx"):
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        
+
+        # --- CONTROLLO E AGGIUNTA AUTOMATICA DELLA COLONNA ---
+        cursor.execute("PRAGMA table_info(prodotti);")
+        colonne = [info[1] for info in cursor.fetchall()]
+        if colonne and 'codice_barra' not in colonne:
+            cursor.execute("ALTER TABLE prodotti ADD COLUMN codice_barra TEXT;")
+            conn.commit()
+        # ----------------------------------------------------
+
         cursor.execute("SELECT id, codice_barra, nome, prezzo, giacenza FROM prodotti")
         rows = cursor.fetchall()
         column_names = [description[0] for description in cursor.description]
-        
+
         conn.close()
         
         wb = openpyxl.Workbook()
@@ -60,3 +68,4 @@ def importa_magazzino_excel(file_path=None):
         return True, "Importazione completata con successo!"
     except Exception as e:
         return False, str(e)
+

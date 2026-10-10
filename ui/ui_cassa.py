@@ -1,3 +1,4 @@
+
 from ui.ui_magazzino import InterfacciaMagazzino
 import sqlite3
 from kivy.uix.boxlayout import BoxLayout
@@ -6,11 +7,13 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
 from ui.ui_styles import CustomButton, COLORI_REPARTI
+from kivy.metrics import dp
+
 
 class InterfacciaCassa:
     @staticmethod
     def crea_menu_superiore(app_instance):
-        nav_layout = BoxLayout(size_hint_y=None, height=52, padding=0, spacing=10)
+        nav_layout = BoxLayout(size_hint_y=None, height=dp(64), padding=0, spacing=10)
         
         btn_vendita = CustomButton(text="Cassa / Vendita", bg_color=(0.3, 0.15, 0.7, 1), bold=True, font_size='14sp')
         btn_vendita.bind(on_press=lambda x: app_instance.mostra_schermata("vendita"))
@@ -173,5 +176,12 @@ class InterfacciaCassa:
         scroll.add_widget(box_vendite)
         layout.add_widget(scroll)
         return layout
+
+
+
+
+
+
+
 
 
