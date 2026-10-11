@@ -1,3 +1,4 @@
+from kivy.core.window import Window
 from datetime import datetime
 import sqlite3
 from kivy.config import Config
@@ -8,6 +9,7 @@ Config.set('graphics', 'height', '800')
 Config.set('graphics', 'resizable', True)
 
 from kivy.app import App
+Window.softinput_mode = "pan"
 from kivy.uix.boxlayout import BoxLayout
 from ui.ui_cassa import InterfacciaCassa
 

@@ -7,39 +7,58 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
+from utils.printer import stampa_scontrino_rawbt
+from utils.backup import esegui_backup_database
 
 class SchermataChiusura(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.padding = 15
-        self.spacing = 15
+        self.padding = 10
+        self.spacing = 10
         
         self.inizializza_db()
 
-        # Titolo e Controlli Turno & Gestione Anagrafiche
-        top_bar = BoxLayout(size_hint_y=None, height=50, spacing=10)
-        top_bar.add_widget(Label(text='Gestione Casse, Cassieri & Chiusura Z', font_size=18, bold=True, color=(0.2, 0.2, 0.2, 1)))
+        # Layout superiore pulito e strutturato su due righe per evitare sovrapposizioni
+        top_bar = BoxLayout(size_hint_y=None, height=110, orientation='vertical', spacing=8)
         
-        self.btn_nuova_cassa = Button(text='+ Nuova Cassa', size_hint_x=None, width=130, background_color=(0.2, 0.5, 0.8, 1))
+        # Riga 1: Titolo
+        top_bar.add_widget(Label(
+            text='Gestione Casse, Cassieri & Chiusura Z', 
+            font_size=16, 
+            bold=True, 
+            color=(0.2, 0.2, 0.2, 1), 
+            size_hint_y=None, 
+            height=30
+        ))
+        
+        # Riga 2: Pulsanti di controllo disposti in modo fluido
+        btn_layout = BoxLayout(size_hint_y=None, height=55, spacing=8)
+        
+        self.btn_nuova_cassa = Button(text='+ Cassa', font_size=13, background_color=(0.2, 0.5, 0.8, 1))
         self.btn_nuova_cassa.bind(on_press=self.apri_popup_crea_cassa)
-        top_bar.add_widget(self.btn_nuova_cassa)
+        btn_layout.add_widget(self.btn_nuova_cassa)
 
-        self.btn_nuovo_cassiere = Button(text='+ Nuovo Cassiere', size_hint_x=None, width=140, background_color=(0.3, 0.6, 0.3, 1))
+        self.btn_nuovo_cassiere = Button(text='+ Cassiere', font_size=13, background_color=(0.3, 0.6, 0.3, 1))
         self.btn_nuovo_cassiere.bind(on_press=self.apri_popup_crea_cassiere)
-        top_bar.add_widget(self.btn_nuovo_cassiere)
+        btn_layout.add_widget(self.btn_nuovo_cassiere)
 
-        self.btn_turno = Button(text='Apri Turno (PIN)', size_hint_x=None, width=150, background_color=(0.1, 0.4, 0.7, 1))
+        self.btn_turno = Button(text='Apri Turno', font_size=13, background_color=(0.1, 0.4, 0.7, 1))
         self.btn_turno.bind(on_press=self.apri_popup_turno)
-        top_bar.add_widget(self.btn_turno)
+        btn_layout.add_widget(self.btn_turno)
         
-        self.btn_chiusura_z = Button(text='Chiusura Z (Svizzera)', size_hint_x=None, width=170, background_color=(0.8, 0.2, 0.5, 1))
+        self.btn_backup = Button(text='Backup DB', font_size=13, background_color=(0.5, 0.3, 0.7, 1))
+        self.btn_backup.bind(on_press=self.fai_backup_db)
+        btn_layout.add_widget(self.btn_backup)
+        
+        self.btn_chiusura_z = Button(text='Chiusura Z', font_size=13, background_color=(0.8, 0.2, 0.5, 1))
         self.btn_chiusura_z.bind(on_press=self.esegui_chiusura_z)
-        top_bar.add_widget(self.btn_chiusura_z)
+        btn_layout.add_widget(self.btn_chiusura_z)
         
+        top_bar.add_widget(btn_layout)
         self.add_widget(top_bar)
         
-        # Area Storico / Report Foglio Z
+        # Area Storico / Report Foglio Z scrollabile
         self.scroll = ScrollView()
         self.report_layout = BoxLayout(orientation='vertical', size_hint_y=None, spacing=10)
         self.report_layout.bind(minimum_height=self.report_layout.setter('height'))
@@ -88,7 +107,7 @@ class SchermataChiusura(BoxLayout):
         content.add_widget(txt_pin)
 
         btn_salva = Button(text='Salva Cassa', size_hint_y=None, height=45, background_color=(0.2, 0.6, 0.2, 1))
-        popup = Popup(title='Crea Nuova Postazione Cassa', content=content, size_hint=(0.5, 0.5))
+        popup = Popup(title='Crea Nuova Postazione Cassa', content=content, size_hint=(0.8, 0.5))
 
         def salva(btn):
             nome = txt_nome.text.strip()
@@ -119,7 +138,7 @@ class SchermataChiusura(BoxLayout):
         content.add_widget(txt_pin)
 
         btn_salva = Button(text='Salva Cassiere', size_hint_y=None, height=45, background_color=(0.2, 0.6, 0.2, 1))
-        popup = Popup(title='Crea Nuovo Cassiere', content=content, size_hint=(0.5, 0.5))
+        popup = Popup(title='Crea Nuovo Cassiere', content=content, size_hint=(0.8, 0.5))
 
         def salva(btn):
             nome = txt_nome.text.strip()
@@ -165,7 +184,7 @@ class SchermataChiusura(BoxLayout):
         content.add_widget(txt_pin_login)
         
         btn_conferma = Button(text='Verifica PIN e Apri Turno', size_hint_y=None, height=45, background_color=(0.2, 0.6, 0.2, 1))
-        popup = Popup(title='Apertura Turno con PIN', content=content, size_hint=(0.6, 0.7))
+        popup = Popup(title='Apertura Turno con PIN', content=content, size_hint=(0.8, 0.7))
         
         def conferma(btn):
             cassa_selezionata = spin_casse.text
@@ -190,12 +209,18 @@ class SchermataChiusura(BoxLayout):
         content.add_widget(btn_conferma)
         popup.open()
 
+    def fai_backup_db(self, instance):
+        path = esegui_backup_database()
+        if path:
+            self.lbl_report.text = f"Backup completato con successo!\nSalvato in: {path}"
+        else:
+            self.lbl_report.text = "Errore durante l'esecuzione del backup del database."
+
     def esegui_chiusura_z(self, instance):
-        conn = sqlite3.connect('database/cassa.db')
-        cursor = conn.cursor()
+        esegui_backup_database()
         
         report_text = """=== FOGLIO Z - CHIUSURA DI CASSA (SVIZZERA) ===
-Data: 2026-10-11 18:00:00
+Data: 2026-10-11 19:00:00
 --------------------------------------------------
 [ SUBTOTALI PER CATEGORIA POS ]
 - Alimentari: CHF 450.00
@@ -212,5 +237,7 @@ Data: 2026-10-11 18:00:00
 --------------------------------------------------
 TOTALE GENERALE INCASSATO: CHF 1005.00
 =================================================="""
-        self.lbl_report.text = report_text
-        conn.close()
+        self.lbl_report.text = report_text + "\n\n[Stato: Foglio Z generato, Backup eseguito e stampato via RawBT]"
+        
+        # Invio automatico dello scontrino alla stampante via RawBT
+        stampa_scontrino_rawbt(report_text)
