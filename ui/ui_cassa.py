@@ -114,7 +114,7 @@ class InterfacciaCassa:
         
         grid_tasti = GridLayout(cols=3, spacing=8, size_hint_x=0.72)
         for t in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ',', '⌫']:
-            btn = CustomButton(text=t, bg_color=(1, 1, 1, 1), color=(0.1, 0.1, 0.1, 1), font_size='15sp', bold=True)
+            btn = CustomButton(text=t, bg_color=(0.88, 0.88, 0.88, 1), color=(0.1, 0.1, 0.1, 1), font_size='15sp', bold=True)
             btn.bind(on_press=lambda instance, val=t: app_instance.premi_tasto(val))
             grid_tasti.add_widget(btn)
         tastierino_layout.add_widget(grid_tasti)
