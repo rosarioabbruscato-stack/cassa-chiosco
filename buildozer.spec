@@ -318,6 +318,7 @@ android.allow_backup = True
 # Available options for Android API >= 28 are "default, shortEdges, never" and defaults to never.
 # Android documentation: https://developer.android.com/develop/ui/views/layout/display-cutout
 #android.display_cutout = never
+android.architectures = arm64-v8a
 
 #
 # Python for android (p4a) specific
