@@ -247,7 +247,7 @@ class InterfacciaMagazzino(BoxLayout):
                 
                 self.aggiorna_lista_prodotti()
             except Exception as e:
-                print(f"Errore raggruppamento: {e}")
+                print("Errore ordinamento:", e)
             finally:
                 popup.dismiss()
 
@@ -278,6 +278,23 @@ class InterfacciaMagazzino(BoxLayout):
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
+
+        # Migrazione automatica delle colonne mancanti
+        cursor.execute("PRAGMA table_info(prodotti)")
+        colonne_esistenti = [col[1] for col in cursor.fetchall()]
+        colonne_richieste = {
+            "codice_barra": "TEXT",
+            "categoria": "TEXT",
+            "lotto": "TEXT",
+            "data_scadenza": "TEXT",
+            "categoria_pos": "TEXT",
+            "colore_pulsante": "TEXT"
+        }
+        for col_nome, col_tipo in colonne_richieste.items():
+            if col_nome not in colonne_esistenti:
+                cursor.execute(f"ALTER TABLE prodotti ADD COLUMN {col_nome} {col_tipo}")
+                conn.commit()
+
         cursor.execute("SELECT id, codice_barra, nome, prezzo, categoria, giacenza, lotto, data_scadenza, categoria_pos, colore_pulsante FROM prodotti ORDER BY nome ASC")
         prodotti = cursor.fetchall()
         conn.close()
@@ -306,11 +323,11 @@ class InterfacciaMagazzino(BoxLayout):
                     else:
                         chiavi_tupla.append(str(val or 'Senza Valore'))
                 return tuple(chiavi_tupla)
-            
+
             try:
                 prodotti.sort(key=chiave_ordinamento)
             except Exception as e:
-                print(f"Errore ordinamento: {e}")
+                print("Errore ordinamento:", e)
 
         ultimi_valori_gruppo = {}
 
