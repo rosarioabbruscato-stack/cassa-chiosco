@@ -1,4 +1,6 @@
+from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
+Window.clearcolor = (0, 0, 0, 1)
 from datetime import datetime
 import sqlite3
 from kivy.config import Config
@@ -37,7 +39,13 @@ class CassaApp(App):
         
         self.inizializza_db_se_manca()
         self.mostra_schermata("vendita")
-        return self.root_layout
+        # Contenitore con aspect ratio fisso e riempimento verticale
+        root_aspect = FloatLayout()
+        self.root_layout.size_hint = (None, 1)
+        self.root_layout.bind(height=lambda inst, h: setattr(inst, 'width', h * 1.6))
+        self.root_layout.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        root_aspect.add_widget(self.root_layout)
+        return root_aspect
 
     def inizializza_db_se_manca(self):
         conn = sqlite3.connect(self.db_name)
