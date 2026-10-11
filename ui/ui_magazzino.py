@@ -1,4 +1,5 @@
 import os
+from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
@@ -16,8 +17,8 @@ class InterfacciaMagazzino(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.padding = 10
-        self.spacing = 10
+        self.padding = dp(10)
+        self.spacing = dp(10)
         self.prodotto_selezionato_id = None
         self.checkboxes_prodotti = {}
         self.modalita_vista = 'elenco'
