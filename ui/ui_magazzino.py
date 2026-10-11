@@ -27,7 +27,9 @@ class InterfacciaMagazzino(BoxLayout):
         top_layout = BoxLayout(size_hint_y=None, height=45, spacing=10)
         top_layout.add_widget(Label(text="Gestione Magazzino (Stile Odoo)", font_size=18, bold=True, color=(0.1, 0.1, 0.1, 1)))
         
-        self.btn_vista_elenco = Button(text="Vista Elenco", size_hint_x=None, width=110, background_color=(0.1, 0.4, 0.6, 1))
+        self.btn_vista_elenco = Button(text='Elenco', size_hint_x=None, width=95, background_color=(0.1, 0.4, 0.6, 1))
+        self.btn_vista_griglia = Button(text='Griglia', size_hint_x=None, width=95, background_color=(0.1, 0.4, 0.6, 1))
+        self.btn_esporta_excel = Button(text='Esporta', size_hint_x=None, width=95, background_color=(0.2, 0.6, 0.2, 1))
         self.btn_vista_elenco.bind(on_press=lambda x: self.cambia_vista('elenco'))
         top_layout.add_widget(self.btn_vista_elenco)
 
@@ -110,8 +112,14 @@ class InterfacciaMagazzino(BoxLayout):
         foto_box = BoxLayout(orientation='vertical', size_hint_x=None, width=130, spacing=2)
         foto_box.add_widget(Label(text='Foto Prodotto', font_size=12, bold=True, size_hint_y=None, height=18, color=(0.1, 0.1, 0.1, 1)))
         
+        # Pulsante Scegli Immagine
+        # btn_rimosso = Button(text='Scegli Immagine...', size_hint_y=None, height=35, background_color=(0.1, 0.4, 0.7, 1))
+        # btn_rimosso.bind(on_press=self.seleziona_immagine)
+        # rimosso nome errato
+
         self.input_foto = TextInput(text='', multiline=False, font_size=11, hint_text='Path immagine...', size_hint_y=None, height=30)
         self.btn_anteprima_foto = Button(text='[ 📷 Quadrata\n130 x 130 ]', font_size=12, background_color=(0.88, 0.88, 0.90, 1), color=(0.2, 0.2, 0.2, 1))
+        self.btn_anteprima_foto.bind(on_press=self.seleziona_immagine)
         
         foto_box.add_widget(self.btn_anteprima_foto)
         foto_box.add_widget(self.input_foto)
@@ -608,3 +616,44 @@ class InterfacciaMagazzino(BoxLayout):
                     self._on_file_selected([file_path])
             except Exception as e:
                 print(f"Errore nella selezione file: {e}")
+
+    def seleziona_immagine(self, instance):
+        from kivy.uix.popup import Popup
+        from kivy.uix.filechooser import FileChooserListView
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.button import Button
+        import os
+
+        content = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        filechooser = FileChooserListView(path=os.getcwd(), filters=['*.png', '*.jpg', '*.jpeg'])
+        content.add_widget(filechooser)
+
+        btn_layout = BoxLayout(size_hint_y=None, height=40, spacing=10)
+        btn_seleziona = Button(text='Seleziona', background_color=(0.1, 0.4, 0.7, 1))
+        btn_chiudi = Button(text='Annulla', background_color=(0.5, 0.5, 0.5, 1))
+        
+        btn_layout.add_widget(btn_seleziona)
+        btn_layout.add_widget(btn_chiudi)
+        content.add_widget(btn_layout)
+
+        popup = Popup(title='Seleziona un immagine', content=content, size_hint=(0.8, 0.8))
+
+        def on_选择(btn):
+            if filechooser.selection:
+                self._on_image_selected(filechooser.selection)
+            popup.dismiss()
+
+        btn_seleziona.bind(on_press=on_选择)
+        btn_chiudi.bind(on_press=popup.dismiss)
+        popup.open()
+
+    def _on_image_selected(self, selection):
+        if selection and len(selection) > 0:
+            path_img = selection[0]
+            self.input_foto.text = path_img
+            # Aggiorniamo il pulsante o l'anteprima foto
+        if hasattr(self, 'btn_anteprima_foto'):
+            self.btn_anteprima_foto.background_normal = path_img
+            self.btn_anteprima_foto.text = ''
+        if hasattr(self, 'img_preview'):
+                self.img_preview.source = path_img
