@@ -1,3 +1,4 @@
+from ui.ui_chiusura import SchermataChiusura
 
 from ui.ui_magazzino import InterfacciaMagazzino
 import sqlite3
@@ -141,48 +142,6 @@ class InterfacciaCassa:
     @staticmethod
     def crea_schermata_magazzino(app_instance):
         return InterfacciaMagazzino()
+    @staticmethod
     def crea_schermata_storico(app_instance):
-        layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
-        
-        top_storico_bar = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=10)
-        lbl_titolo = Label(text="Chiusura Z, Storico & Casse", font_size='18sp', color=(0.1, 0.1, 0.1, 1), bold=True, halign='left')
-        lbl_titolo.bind(size=lbl_titolo.setter('text_size'))
-        top_storico_bar.add_widget(lbl_titolo)
-        
-        btn_chiusura_z = CustomButton(text="Esegui Chiusura Z", bg_color=(0.8, 0.3, 0.7, 1), size_hint_x=None, width=160, bold=True, font_size='13sp')
-        btn_chiusura_z.bind(on_press=app_instance.esegui_chiusura_z)
-        top_storico_bar.add_widget(btn_chiusura_z)
-        layout.add_widget(top_storico_bar)
-        
-        scroll = ScrollView()
-        box_vendite = BoxLayout(orientation='vertical', size_hint_y=None, spacing=8)
-        box_vendite.bind(minimum_height=box_vendite.setter('height'))
-        
-        conn = sqlite3.connect(app_instance.db_name)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, data_ora, totale, pagamento, cassiere FROM vendite ORDER BY id DESC LIMIT 50")
-        rows = cursor.fetchall()
-        conn.close()
-        
-        if not rows:
-            lbl_vuoto = Label(text="Nessuna vendita registrata.", size_hint_y=None, height=40, color=(0.3, 0.3, 0.3, 1))
-            lbl_vuoto.bind(size=lbl_vuoto.setter('text_size'))
-            box_vendite.add_widget(lbl_vuoto)
-        for v_id, data, tot, pag, op in rows:
-            lbl = Label(text=f"#{v_id} | {data} | {app_instance.valuta_corrente} {tot:.2f} ({pag}) [Op: {op}]", size_hint_y=None, height=40, halign='left', color=(0.2, 0.2, 0.2, 1))
-            lbl.bind(size=lbl.setter('text_size'))
-            box_vendite.add_widget(lbl)
-            
-        scroll.add_widget(box_vendite)
-        layout.add_widget(scroll)
-        return layout
-
-
-
-
-
-
-
-
-
-
+        return SchermataChiusura()
