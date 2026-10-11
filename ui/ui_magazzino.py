@@ -240,22 +240,15 @@ class InterfacciaMagazzino(BoxLayout):
         def applica_e_chiudi(instance):
             try:
                 self.criteri_raggruppamento_attivi = [chiave for chiave, chk in checkboxes_popup.items() if chk.active]
-                
                 if self.criteri_raggruppamento_attivi:
                     self.btn_filtro_avanzato.text = f"Raggruppato per ({len(self.criteri_raggruppamento_attivi)} livelli)"
                 else:
                     self.btn_filtro_avanzato.text = "Raggruppa per..."
-                
                 self.aggiorna_lista_prodotti()
             except Exception as e:
                 print("Errore ordinamento:", e)
             finally:
                 popup.dismiss()
-
-        btn_applica.bind(on_release=applica_e_chiudi)
-        btn_annulla.bind(on_release=popup.dismiss)
-
-        popup.open()
 
     def aggiorna_spinner_filtro(self):
         cat_vals = self.get_valori_colonna('categoria')
@@ -500,13 +493,79 @@ class InterfacciaMagazzino(BoxLayout):
         except Exception as e:
             self.mostra_popup('Errore', str(e))
 
-    def elimina_prodotto(self, instance):
-        ids_selezionati = [pid for pid, chk in self.checkboxes_prodotti.items() if chk.active]
-        
         try:
+            ids_selezionati = [pid for pid, chk in self.checkboxes_prodotti.items() if chk.active]
             conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
-            
+
+            if ids_selezionati:
+                cursor.executemany("DELETE FROM prodotti WHERE id=?", [(pid,) for pid in ids_selezionati])
+                msg = f"Eliminati {len(ids_selezionati)} prodotti selezionati."
+            elif self.prodotto_selezionato_id:
+                cursor.execute("DELETE FROM prodotti WHERE id=?", (self.prodotto_selezionato_id,))
+                msg = "Prodotto corrente eliminato."
+                self.prodotto_selezionato_id = None
+            else:
+                self.mostra_popup('Attenzione', 'Seleziona almeno un prodotto o spunta i checkbox.')
+                conn.close()
+                return
+
+            conn.commit()
+            conn.close()
+            self.aggiorna_spinner_filtro()
+            self.aggiorna_lista_prodotti()
+            self.mostra_popup('Successo', msg)
+        except Exception as e:
+            self.mostra_popup('Errore', str(e))
+
+        try:
+            ids_selezionati = [pid for pid, chk in self.checkboxes_prodotti.items() if chk.active]
+            path = esporta_magazzino_excel(ids_selezionati if ids_selezionati else None)
+            msg = f"Esportazione completata ({len(ids_selezionati)} articoli selezionati) in: {path}" if ids_selezionati else f"Catalogo completo esportato in: {path}"
+            self.mostra_popup('Successo', msg)
+        except Exception as e:
+            self.mostra_popup('Errore', str(e))
+
+        from kivy.utils import platform
+        if platform == 'android':
+            from plyer import filechooser
+            filechooser.open_file(on_selection=self._on_file_selected)
+        else:
+            import subprocess
+            try:
+                file_path = subprocess.check_output(['zenity', '--file-selection'], text=True).strip()
+                if file_path:
+                    self._on_file_selected([file_path])
+            except Exception as e:
+                print(f"Errore nella selezione file: {e}")
+
+        try:
+            ids_selezionati = [pid for pid, chk in self.checkboxes_prodotti.items() if chk.active]
+            path = esporta_magazzino_excel(ids_selezionati if ids_selezionati else None)
+            msg = f"Esportazione completata ({len(ids_selezionati)} articoli selezionati) in: {path}" if ids_selezionati else f"Catalogo completo esportato in: {path}"
+            self.mostra_popup('Successo', msg)
+        except Exception as e:
+            self.mostra_popup('Errore', str(e))
+
+        from kivy.utils import platform
+        if platform == 'android':
+            from plyer import filechooser
+            filechooser.open_file(on_selection=self._on_file_selected)
+        else:
+            import subprocess
+            try:
+                file_path = subprocess.check_output(['zenity', '--file-selection'], text=True).strip()
+                if file_path:
+                    self._on_file_selected([file_path])
+            except Exception as e:
+                print(f"Errore nella selezione file: {e}")
+
+    def elimina_prodotto(self, instance):
+        try:
+            ids_selezionati = [pid for pid, chk in self.checkboxes_prodotti.items() if chk.active]
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+
             if ids_selezionati:
                 cursor.executemany("DELETE FROM prodotti WHERE id=?", [(pid,) for pid in ids_selezionati])
                 msg = f"Eliminati {len(ids_selezionati)} prodotti selezionati."
@@ -531,7 +590,8 @@ class InterfacciaMagazzino(BoxLayout):
         try:
             ids_selezionati = [pid for pid, chk in self.checkboxes_prodotti.items() if chk.active]
             path = esporta_magazzino_excel(ids_selezionati if ids_selezionati else None)
-            self.mostra_popup('Successo', f'Esportazione completata ({len(ids_selezionati)} articoli selezionati) in: {path}' if ids_selezionati else f'Catalogo completo esportato in: {path}')
+            msg = f"Esportazione completata ({len(ids_selezionati)} articoli selezionati) in: {path}" if ids_selezionati else f"Catalogo completo esportato in: {path}"
+            self.mostra_popup('Successo', msg)
         except Exception as e:
             self.mostra_popup('Errore', str(e))
 
