@@ -19,7 +19,7 @@ class CassaApp(App):
     def build(self):
         # Forziamo le dimensioni della finestra a 1440x900 (16:10)
         from kivy.core.window import Window
-        Window.size = (1440, 900)
+        Window.size = (1280, 720)
 
         self.db_name = "database/negozio.db"
         self.operatore_corrente = "Rosario Vincenzo"
