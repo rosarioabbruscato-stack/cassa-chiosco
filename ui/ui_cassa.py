@@ -102,7 +102,7 @@ class InterfacciaCassa:
         
         # Griglia reparti (font_size ottimizzato a 11sp per far stare comodamente "NON ALIMENTARI" e gli altri)
         reparti_grid = GridLayout(cols=4, spacing=8, size_hint_y=None, height=160)
-        reparti = ["ALIMENTARI", "BIBITE", "CUCINA", "LOTTO", "LOTTO VINCITE", "NON ALIMENTARI", "SIGARETTE"]
+        reparti = []
         for rep in reparti:
             b = CustomButton(text=rep, bg_color=COLORI_REPARTI.get(rep, (0.7, 0.7, 0.7, 1)), color=(0.1, 0.1, 0.1, 1), font_size='11sp', bold=True)
             b.bind(on_press=lambda instance, r=rep: app_instance.seleziona_reparto(r))
