@@ -54,6 +54,12 @@ class SchermataChiusura(BoxLayout):
         self.btn_chiusura_z = Button(text='Chiusura Z', font_size=13, background_color=(0.8, 0.2, 0.5, 1))
         self.btn_chiusura_z.bind(on_press=self.esegui_chiusura_z)
         btn_layout.add_widget(self.btn_chiusura_z)
+
+        self.btn_gestione_pos = Button(text='Gestione POS', font_size=12, background_color=(0.1, 0.5, 0.8, 1))
+        self.btn_gestione_pos.bind(on_press=self.apri_gestione_pulsanti_pos)
+        btn_layout.add_widget(self.btn_gestione_pos)
+
+
         
         top_bar.add_widget(btn_layout)
         self.add_widget(top_bar)
@@ -241,3 +247,192 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
         
         # Invio automatico dello scontrino alla stampante via RawBT
         stampa_scontrino_rawbt(report_text)
+
+
+
+
+
+
+    def apri_gestione_pulsanti_pos(self, instance):
+        content = BoxLayout(orientation='vertical', padding=15, spacing=10)
+        content.add_widget(Label(text='GESTIONE CENTRALIZZATA 12 SLOT POS (PANTONE)', font_size=18, bold=True, size_hint_y=None, height=40))
+
+        grid_slot = GridLayout(cols=1, spacing=8, size_hint_y=None)
+        grid_slot.bind(minimum_height=grid_slot.setter('height'))
+
+        pantone_palette = {
+            'Pantone 102 C (Giallo Vivo)': (1.0, 0.92, 0.0, 1.0),
+            'Pantone 123 C (Giallo Oro)': (1.0, 0.8, 0.0, 1.0),
+            'Pantone 151 C (Arancione Caldo)': (1.0, 0.5, 0.0, 1.0),
+            'Pantone 165 C (Arancio Vivo)': (1.0, 0.35, 0.0, 1.0),
+            'Pantone 485 C (Rosso Pantone)': (0.85, 0.1, 0.1, 1.0),
+            'Pantone 186 C (Rosso Rubino)': (0.8, 0.0, 0.15, 1.0),
+            'Pantone 219 C (Magenta Vivo)': (0.9, 0.1, 0.5, 1.0),
+            'Pantone 2598 C (Porpora)': (0.5, 0.1, 0.6, 1.0),
+            'Pantone 2685 C (Viola Scuro)': (0.35, 0.1, 0.55, 1.0),
+            'Pantone 2748 C (Blu Elettrico)': (0.1, 0.2, 0.7, 1.0),
+            'Pantone 286 C (Blu Classico)': (0.0, 0.18, 0.55, 1.0),
+            'Pantone 300 C (Azzurro)': (0.0, 0.45, 0.8, 1.0),
+            'Pantone 299 C (Celeste)': (0.0, 0.65, 0.9, 1.0),
+            'Pantone 341 C (Verde Scuro)': (0.0, 0.45, 0.25, 1.0),
+            'Pantone 355 C (Verde Prato)': (0.0, 0.6, 0.2, 1.0),
+            'Pantone 368 C (Verde Mela)': (0.4, 0.75, 0.1, 1.0),
+            'Pantone 471 C (Marrone Terra)': (0.7, 0.35, 0.1, 1.0),
+            'Pantone 4625 C (Marrone Scuro)': (0.35, 0.2, 0.1, 1.0),
+            'Pantone 430 C (Grigio Medio)': (0.5, 0.5, 0.5, 1.0),
+            'Pantone 422 C (Grigio Chiaro)': (0.7, 0.7, 0.7, 1.0),
+            'Pantone Cool Gray 1 C (Bianco Sporco)': (0.9, 0.9, 0.9, 1.0),
+            'Pantone Black 6 C (Nero Profondo)': (0.1, 0.1, 0.1, 1.0)
+        }
+
+        def trova_nome_pantone(r, g, b):
+            for nome_p, val in pantone_palette.items():
+                if abs(val[0] - r) < 0.15 and abs(val[1] - g) < 0.15 and abs(val[2] - b) < 0.15:
+                    return nome_p
+            return 'Pantone 286 C (Blu Classico)'
+
+        def carica_dati_slot():
+            grid_slot.clear_widgets()
+            import sqlite3
+            conn = sqlite3.connect('database/negozio.db')
+            cursor = conn.cursor()
+            cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
+            rows = cursor.fetchall()
+            
+            existing_ids = [r[0] for r in rows]
+            for i in range(1, 13):
+                if i not in existing_ids:
+                    cursor.execute('INSERT OR REPLACE INTO config_reparti (id, nome, colore_r, colore_g, colore_b, colore_a, attivo, standby) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                                   (i, f'Reparto {i}' if i <= 11 else '', 0.0, 0.18, 0.55, 1.0, 1 if i <= 11 else 0, 0))
+            
+            if len(rows) < 8:
+                cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
+                rows = cursor.fetchall()
+            
+            conn.close()
+
+            for row in rows:
+                r_id, r_nome, r_attivo, r_standby, cr, cg, cb, ca = row
+                box_riga = BoxLayout(orientation='horizontal', spacing=8, size_hint_y=None, height=45)
+                
+                txt_nome = TextInput(text=str(r_nome or ''), multiline=False, hint_text=f'Slot {r_id}', size_hint_x=0.35)
+                
+                # Stato iniziale basato sul database
+                if r_standby:
+                    stato_txt = 'Standby'
+                elif r_attivo:
+                    stato_txt = 'Attivo'
+                else:
+                    stato_txt = 'Disattivato'
+
+                btn_stato = Button(text=stato_txt, size_hint_x=0.2, background_color=(0.3, 0.3, 0.3, 1))
+
+                colore_attuale_nome = trova_nome_pantone(cr, cg, cb)
+                btn_colore = Button(text=colore_attuale_nome, size_hint_x=0.25, background_color=(cr, cg, cb, ca))
+
+                btn_salva = Button(text='Salva', background_color=(0.2, 0.7, 0.3, 1), size_hint_x=0.12)
+                btn_elimina = Button(text='Elimina', background_color=(0.8, 0.2, 0.2, 1), size_hint_x=0.08)
+
+                colore_ref = {'rgba': (cr, cg, cb, ca)}
+
+                # Popup selezione Stato
+                def apri_popup_stato(inst, b_st=btn_stato):
+                    box_s = BoxLayout(orientation='vertical', padding=10, spacing=10)
+                    pop_s = Popup(title=f'Seleziona Stato - Slot #{r_id}', content=box_s, size_hint=(0.5, 0.4))
+                    for st in ['Attivo', 'Standby', 'Disattivato']:
+                        def imposta_st(i, s=st):
+                            b_st.text = s
+                            pop_s.dismiss()
+                        b = Button(text=st, font_size=16)
+                        b.bind(on_press=imposta_st)
+                        box_s.add_widget(b)
+                    pop_s.open()
+
+                # Popup selezione Pantone
+                def apri_popup_pantone(inst, b_col=btn_colore):
+                    box_p = BoxLayout(orientation='vertical', padding=10, spacing=8)
+                    sv_p = ScrollView()
+                    grid_p = GridLayout(cols=1, spacing=5, size_hint_y=None)
+                    grid_p.bind(minimum_height=grid_p.setter('height'))
+                    
+                    pop_p = Popup(title=f'Seleziona Pantone - Slot #{r_id}', content=box_p, size_hint=(0.7, 0.7))
+                    
+                    for p_nome, p_rgba in pantone_palette.items():
+                        def imposta_colore(i, pn=p_nome, prgba=p_rgba):
+                            colore_ref['rgba'] = prgba
+                            b_col.text = pn
+                            b_col.background_color = prgba
+                            pop_p.dismiss()
+                        
+                        bc = Button(text=p_nome, background_color=p_rgba, size_hint_y=None, height=40, font_size=14)
+                        bc.bind(on_press=imposta_colore)
+                        grid_p.add_widget(bc)
+                    
+                    sv_p.add_widget(grid_p)
+                    box_p.add_widget(sv_p)
+                    
+                    btn_chiudi_p = Button(text='Annulla', size_hint_y=None, height=40)
+                    btn_chiudi_p.bind(on_press=pop_p.dismiss)
+                    box_p.add_widget(btn_chiudi_p)
+                    
+                    pop_p.open()
+
+                btn_stato.bind(on_press=apri_popup_stato)
+                btn_colore.bind(on_press=apri_popup_pantone)
+
+                def fai_salva(inst, sid=r_id, tb=txt_nome, b_st=btn_stato):
+                    n_val = tb.text.strip()
+                    s_val = b_st.text.strip()
+                    rgba = colore_ref['rgba']
+                    
+                    # Lettura diretta e rigorosa dal testo del pulsante stato
+                    if s_val == 'Standby':
+                        attivo = 1
+                        standby = 1
+                    elif s_val == 'Attivo':
+                        attivo = 1
+                        standby = 0
+                    else:
+                        attivo = 0
+                        standby = 0
+                    
+                    cx = sqlite3.connect('database/negozio.db')
+                    cu = cx.cursor()
+                    cu.execute('UPDATE config_reparti SET nome = ?, attivo = ?, standby = ?, colore_r = ?, colore_g = ?, colore_b = ?, colore_a = ? WHERE id = ?',
+                               (n_val, attivo, standby, rgba[0], rgba[1], rgba[2], rgba[3], sid))
+                    cx.commit()
+                    cx.close()
+                    carica_dati_slot()
+
+                def fai_elimina(inst, sid=r_id, tb=txt_nome, b_st=btn_stato):
+                    cx = sqlite3.connect('database/negozio.db')
+                    cu = cx.cursor()
+                    cu.execute('UPDATE config_reparti SET nome = ?, attivo = 0, standby = 0 WHERE id = ?', ('', sid))
+                    cx.commit()
+                    cx.close()
+                    carica_dati_slot()
+
+                btn_salva.bind(on_press=fai_salva)
+                btn_elimina.bind(on_press=fai_elimina)
+
+                box_riga.add_widget(Label(text=f'#{r_id}', size_hint_x=None, width=35, bold=True))
+                box_riga.add_widget(txt_nome)
+                box_riga.add_widget(btn_stato)
+                box_riga.add_widget(btn_colore)
+                box_riga.add_widget(btn_salva)
+                box_riga.add_widget(btn_elimina)
+                
+                grid_slot.add_widget(box_riga)
+
+        carica_dati_slot()
+
+        sv = ScrollView(size_hint=(1, 1))
+        sv.add_widget(grid_slot)
+        content.add_widget(sv)
+
+        btn_chiudi = Button(text='Chiudi Pannello', size_hint_y=None, height=50, background_color=(0.3, 0.3, 0.3, 1))
+        popup = Popup(title='Gestione Pulsanti POS (12 Slot Fissi - Pantone)', content=content, size_hint=(0.9, 0.85))
+        btn_chiudi.bind(on_press=popup.dismiss)
+        content.add_widget(btn_chiudi)
+
+        popup.open()
