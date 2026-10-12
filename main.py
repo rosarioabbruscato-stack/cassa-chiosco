@@ -1,3 +1,4 @@
+from utils.printer import stampa_scontrino_rawbt
 from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
 Window.clearcolor = (0, 0, 0, 1)
@@ -222,22 +223,29 @@ class CassaApp(App):
         self.aggiorna_vista_scontrino()
         self.lbl_stato_corrente.text = "Pronto per nuova vendita"
         self.btn_azione_scontrino.text = "Elimina Riga Selezionata"
-        self.btn_azione_scontrino.set_color((0.9, 0.25, 0.25, 1))
 
-    
+
     def stampa_scontrino_manuale(self, *args):
         if not self.scontrino_righe:
             self.lbl_stato_corrente.text = "Impossibile stampare: scontrino vuoto"
             return
-        dettagli = " | ".join([r[0] for r in self.scontrino_righe])
-        self.esegui_stampa_termica(dettagli, self.totale_generale, "MANUALE")
-        self.lbl_stato_corrente.text = "Scontrino stampato manualmente"
+        righe = [f"Cassa: {self.cassa_corrente}", f"Op: {self.operatore_corrente}", "-" * 32]
+        for r in self.scontrino_righe:
+            righe.append(str(r[0]))
+        righe.append("-" * 32)
+        righe.append(f"TOTALE: CHF {self.totale_generale:.2f}")
+        testo = "\n".join(righe) + "\n"
+        try:
+            stampa_scontrino_rawbt(testo)
+            self.lbl_stato_corrente.text = "Scontrino inviato a RawBT"
+        except Exception as e:
+            self.lbl_stato_corrente.text = f"Errore stampa RawBT: {e}"
 
     def esegui_stampa_termica(self, dettagli, totale, pagamento):
         pass
 
     def esegui_chiusura_z(self, *args):
-        self.lbl_stato_corrente.text = "Chiusura Z calcolata e registrata con successo!"
+        self.lbl_stato_corrente.text = "Chiusura Z calcolata e registrata con successo"
 
 if __name__ == '__main__':
     CassaApp().run()

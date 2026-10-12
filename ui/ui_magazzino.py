@@ -25,8 +25,11 @@ class InterfacciaMagazzino(BoxLayout):
         self.criteri_raggruppamento_attivi = []
 
         top_layout = BoxLayout(size_hint_y=None, height=45, spacing=10)
-        top_layout.add_widget(Label(text="Gestione Magazzino (Stile Odoo)", font_size=18, bold=True, color=(0.1, 0.1, 0.1, 1)))
+        top_layout.add_widget(Label(text="Gestione Magazzino", font_size=18, bold=True, color=(0.1, 0.1, 0.1, 1)))
         
+        self.btn_inventario = Button(text='Inventario', size_hint_x=None, width=95, background_color=(0.1, 0.3, 0.5, 1))
+        top_layout.add_widget(self.btn_inventario)
+        self.btn_inventario.bind(on_press=self.apri_popup_inventario)
         self.btn_vista_elenco = Button(text='Elenco', size_hint_x=None, width=95, background_color=(0.1, 0.4, 0.6, 1))
         self.btn_vista_griglia = Button(text='Griglia', size_hint_x=None, width=95, background_color=(0.1, 0.4, 0.6, 1))
         self.btn_esporta_excel = Button(text='Esporta', size_hint_x=None, width=95, background_color=(0.2, 0.6, 0.2, 1))
@@ -657,3 +660,232 @@ class InterfacciaMagazzino(BoxLayout):
             self.btn_anteprima_foto.text = ''
         if hasattr(self, 'img_preview'):
                 self.img_preview.source = path_img
+
+    
+    
+    
+    
+    def apri_popup_inventario(self, *args):
+        from kivy.uix.popup import Popup
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.scrollview import ScrollView
+        from kivy.uix.gridlayout import GridLayout
+        from kivy.uix.label import Label
+        from kivy.uix.checkbox import CheckBox
+        from kivy.uix.textinput import TextInput
+        from kivy.uix.button import Button
+        from kivy.graphics import Color, Rectangle
+        import sqlite3
+
+        content = BoxLayout(orientation='vertical', spacing=10, padding=12)
+        
+        # Sfondo bianco per il popup
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            content.rect = Rectangle(size=content.size, pos=content.pos)
+        content.bind(size=lambda s, w: setattr(s.rect, 'size', w), pos=lambda s, p: setattr(s.rect, 'pos', p))
+
+        content.add_widget(Label(text="Gestione Inventario - Selezione Multipla", font_size=16, bold=True, color=(0.1, 0.1, 0.1, 1), size_hint_y=None, height=35))
+        
+        # Riga "Seleziona / Deseleziona Tutti" ben visibile
+        top_sel_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=10)
+        chk_tutti = CheckBox(size_hint_x=None, width=40, active=False, color=(0, 0, 0, 1))
+        top_sel_box.add_widget(chk_tutti)
+        lbl_tutti = Label(text="Seleziona / Deseleziona Tutti", bold=True, color=(0.1, 0.1, 0.1, 1), halign='left', valign='middle')
+        lbl_tutti.bind(size=lambda s, w: setattr(s, 'text_size', w))
+        top_sel_box.add_widget(lbl_tutti)
+        content.add_widget(top_sel_box)
+
+        # Area Scrollabile con elenco pulito (senza box separati)
+        scroll = ScrollView(size_hint=(1, 0.50))
+        list_layout = GridLayout(cols=1, spacing=2, size_hint_y=None)
+        list_layout.bind(minimum_height=list_layout.setter('height'))
+
+        checkboxes_mapping = []
+
+        try:
+            conn = sqlite3.connect('cassa.db')
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, codice_barre, nome, categoria, lotto, giacenza FROM prodotti")
+            righe = cursor.fetchall()
+            conn.close()
+
+            if not righe:
+                list_layout.add_widget(Label(text="Nessun prodotto trovato nel magazzino.", color=(0.5, 0.5, 0.5, 1), size_hint_y=None, height=40))
+            else:
+                for riga in righe:
+                    prod_id, codice, nome, cat, lotto, giac = riga
+                    
+                    # Riga pulita senza box o sfondi pesanti
+                    row_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=35, spacing=10)
+                    
+                    chk = CheckBox(size_hint_x=None, width=40, active=False, color=(0, 0, 0, 1))
+                    row_box.add_widget(chk)
+                    
+                    info_text = f"[{codice or 'N/D'}] {nome} | Cat: {cat or 'N/D'} | Lotto: {lotto or 'N/D'} | Giac: {giac}"
+                    lbl_info = Label(text=info_text, color=(0.1, 0.1, 0.1, 1), halign='left', valign='middle')
+                    lbl_info.bind(size=lambda s, w: setattr(s, 'text_size', w))
+                    row_box.add_widget(lbl_info)
+                    
+                    list_layout.add_widget(row_box)
+                    checkboxes_mapping.append((chk, codice, nome))
+        except Exception as e:
+            list_layout.add_widget(Label(text=f"Errore lettura DB: {e}", color=(0.8, 0, 0, 1), size_hint_y=None, height=40))
+
+        # Funzione per il checkbox "Seleziona Tutti"
+        def toggle_tutti(instance, value):
+            for chk, _, _ in checkboxes_mapping:
+                chk.active = value
+        chk_tutti.bind(active=toggle_tutti)
+
+        scroll.add_widget(list_layout)
+        content.add_widget(scroll)
+
+        # Pannello controlli movimento
+        controlli_box = GridLayout(cols=2, spacing=8, size_hint_y=None, height=90)
+        
+        controlli_box.add_widget(Label(text="Tipo Movimento:", color=(0.1, 0.1, 0.1, 1), halign='right'))
+        txt_tipo = TextInput(text='Carico', multiline=False)
+        controlli_box.add_widget(txt_tipo)
+
+        controlli_box.add_widget(Label(text="Quantità da applicare:", color=(0.1, 0.1, 0.1, 1), halign='right'))
+        txt_qta = TextInput(text='1', multiline=False)
+        controlli_box.add_widget(txt_qta)
+
+        content.add_widget(controlli_box)
+
+                # Pulsanti Esporta ed Importa Inventario
+        box_excel = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=10)
+        
+                # Funzioni Export / Import CSV pulite e sicure
+        def mostra_messaggio(testo, errore=False):
+            try:
+                lbl_esito.color = (0.8, 0, 0, 1) if errore else (0, 0.5, 0, 1)
+                lbl_esito.text = testo
+            except:
+                print(testo)
+
+        def esporta_selezionati(instance):
+            import sqlite3
+            import csv
+            try:
+                selezionati_codice = [item[1] for item in checkboxes_mapping if item[0].active]
+                conn = sqlite3.connect('cassa.db')
+                cursor = conn.cursor()
+                if selezionati_codice:
+                    placeholders = ','.join(['?'] * len(selezionati_codice))
+                    cursor.execute(f"SELECT codice_barre, nome, categoria, lotto, scadenza, colore, prezzo, giacenza FROM prodotti WHERE codice_barre IN ({placeholders})", tuple(selezionati_codice))
+                else:
+                    cursor.execute("SELECT codice_barre, nome, categoria, lotto, scadenza, colore, prezzo, giacenza FROM prodotti")
+                
+                righe_db = cursor.fetchall()
+                conn.close()
+                
+                file_name = "inventario_esportato.csv"
+                with open(file_name, mode='w', newline='', encoding='utf-8') as f_csv:
+                    writer = csv.writer(f_csv)
+                    writer.writerow(['codice_barre', 'nome', 'categoria', 'lotto', 'scadenza', 'colore', 'prezzo', 'giacenza'])
+                    writer.writerows(righe_db)
+                
+                mostra_messaggio(f"Esportato in {file_name} con successo!")
+            except Exception as e:
+                mostra_messaggio(f"Errore export: {e}", errore=True)
+
+        def importa_excel(instance):
+            import sqlite3
+            import csv
+            try:
+                file_name = "inventario_import.csv"
+                if not os.path.exists(file_name):
+                    with open(file_name, mode='w', newline='', encoding='utf-8') as f_csv:
+                        writer = csv.writer(f_csv)
+                        writer.writerow(['codice_barre', 'nome', 'categoria', 'lotto', 'scadenza', 'colore', 'prezzo', 'giacenza'])
+                        writer.writerow(['8001234001', 'Prodotto Test 1', 'Generale', 'Lotto-1', '2026-12-31', 'N/D', '1.50', '10.0'])
+                    mostra_messaggio(f"Creato '{file_name}'. Compilalo e riprova.", errore=True)
+                    return
+
+                conn = sqlite3.connect('cassa.db')
+                cursor = conn.cursor()
+                with open(file_name, mode='r', encoding='utf-8') as f_csv:
+                    reader = csv.DictReader(f_csv)
+                    count = 0
+                    for row in reader:
+                        cursor.execute('''
+                            INSERT OR REPLACE INTO prodotti (codice_barre, nome, categoria, lotto, scadenza, colore, prezzo, giacenza)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', (
+                            str(row.get('codice_barre', '')),
+                            str(row.get('nome', '')),
+                            str(row.get('categoria', 'Generale')),
+                            str(row.get('lotto', 'N/D')),
+                            str(row.get('scadenza', '')),
+                            str(row.get('colore', 'N/D')),
+                            float(row.get('prezzo', 0.0) or 0.0),
+                            float(row.get('giacenza', 0.0) or 0.0)
+                        ))
+                        count += 1
+                conn.commit()
+                conn.close()
+                mostra_messaggio(f"Importati {count} articoli con successo!")
+                if hasattr(self, 'aggiorna_tabella'):
+                    self.aggiorna_tabella()
+            except Exception as e:
+                mostra_messaggio(f"Errore import: {e}", errore=True)
+
+        content.add_widget(box_excel)
+
+        box_btn = BoxLayout(orientation='horizontal', size_hint_y=None, height=45, spacing=10)
+        
+        def applica_movimento(instance):
+            tipo = txt_tipo.text.strip().capitalize()
+            try:
+                qta = float(txt_qta.text.strip())
+            except ValueError:
+                lbl_esito.color = (0.8, 0, 0, 1)
+                lbl_esito.text = "Errore: Quantità non valida!"
+                return
+
+            selezionati = [item for item in checkboxes_mapping if item[0].active]
+            if not selezionati:
+                lbl_esito.color = (0.8, 0, 0, 1)
+                lbl_esito.text = "Seleziona almeno un articolo con il flag!"
+                return
+
+            try:
+                conn = sqlite3.connect('cassa.db')
+                cursor = conn.cursor()
+                
+                for chk, codice, nome in selezionati:
+                    articolo_rif = codice if codice else nome
+                    cursor.execute('''
+                        INSERT INTO movimenti_magazzino (data, codice_barre, tipo_movimento, quantita, operatore, note)
+                        VALUES (datetime('now', 'localtime'), ?, ?, ?, 'Operatore', 'Inventario multi-selezione')
+                    ''', (articolo_rif, tipo, qta))
+                    
+                    if tipo == 'Carico':
+                        cursor.execute('UPDATE prodotti SET giacenza = giacenza + ? WHERE codice_barre = ? OR nome = ?', (qta, codice, nome))
+                    elif tipo in ['Scarico', 'Scaduto', 'Perdita']:
+                        cursor.execute('UPDATE prodotti SET giacenza = giacenza - ? WHERE codice_barre = ? OR nome = ?', (qta, codice, nome))
+
+                conn.commit()
+                conn.close()
+                
+                lbl_esito.color = (0, 0.5, 0, 1)
+                lbl_esito.text = f"Movimento '{tipo}' applicato con successo a {len(selezionati)} articoli!"
+                if hasattr(self, 'aggiorna_tabella'):
+                    self.aggiorna_tabella()
+            except Exception as e:
+                lbl_esito.color = (0.8, 0, 0, 1)
+                lbl_esito.text = f"Errore DB: {e}"
+
+        btn_applica = Button(text="Applica a Selezionati", background_color=(0.1, 0.4, 0.2, 1))
+        btn_applica.bind(on_press=applica_movimento)
+        box_btn.add_widget(btn_applica)
+
+        btn_chiudi = Button(text="Chiudi", background_color=(0.5, 0.1, 0.1, 1))
+        popup = Popup(title="Inventario - Selezione Multipla", content=content, size_hint=(0.9, 0.85))
+        btn_chiudi.bind(on_press=popup.dismiss)
+        box_btn.add_widget(btn_chiudi)
+
+        content.add_widget(box_btn)
+        popup.open()
