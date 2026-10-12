@@ -206,7 +206,8 @@ class CassaApp(App):
         conn.commit()
         conn.close()
         
-        self.esegui_stampa_termica(dettagli, self.totale_generale, pagamento)
+        # Rimossa stampa automatica su Cash/Carta/Twint
+        # self.esegui_stampa_termica(dettagli, self.totale_generale, pagamento)
         
         self.vendita_completata_flag = True
         self.lbl_stato_corrente.text = f"Vendita completata ({pagamento}) - Scontrino in verifica"
@@ -222,6 +223,15 @@ class CassaApp(App):
         self.lbl_stato_corrente.text = "Pronto per nuova vendita"
         self.btn_azione_scontrino.text = "Elimina Riga Selezionata"
         self.btn_azione_scontrino.set_color((0.9, 0.25, 0.25, 1))
+
+    
+    def stampa_scontrino_manuale(self, *args):
+        if not self.scontrino_righe:
+            self.lbl_stato_corrente.text = "Impossibile stampare: scontrino vuoto"
+            return
+        dettagli = " | ".join([r[0] for r in self.scontrino_righe])
+        self.esegui_stampa_termica(dettagli, self.totale_generale, "MANUALE")
+        self.lbl_stato_corrente.text = "Scontrino stampato manualmente"
 
     def esegui_stampa_termica(self, dettagli, totale, pagamento):
         pass
