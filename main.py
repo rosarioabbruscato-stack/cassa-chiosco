@@ -128,7 +128,7 @@ class CassaApp(App):
         query = self.input_codice.text.strip()
         if self.prezzo_forzato is not None:
             prezzo_unitario = self.prezzo_forzato
-            nome_prod = f"Reparto {self.reparto_selezionato}" if not query else query
+            nome_prod = f"{self.reparto_selezionato}" if not query else query
             totale_riga = prezzo_unitario * self.moltiplicatore_qta
             riga = f"{self.moltiplicatore_qta}x {nome_prod[:14]:<14} {self.valuta_corrente} {totale_riga:.2f}"
             self.scontrino_righe.append((riga, totale_riga))

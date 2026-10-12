@@ -38,7 +38,7 @@ class InterfacciaCassa:
         left_box = BoxLayout(orientation='vertical', padding=15, spacing=10, size_hint_x=0.50)
         
         scroll_scontrino = ScrollView()
-        app_instance.scontrino_label = Label(text="Scontrino Vuoto", font_size='13sp', halign='left', valign='top', size_hint_y=None, color=(0.2, 0.2, 0.2, 1))
+        app_instance.scontrino_label = Label(text="Scontrino Vuoto", font_name="DejaVuSansMono" if "RobotoMono" in ["RobotoMono"] else "Courier", font_size='13sp', halign='left', valign='top', size_hint_y=None, color=(0.2, 0.2, 0.2, 1))
         app_instance.scontrino_label.bind(width=lambda *x: setattr(app_instance.scontrino_label, 'text_size', (app_instance.scontrino_label.width, None)))
         app_instance.scontrino_label.bind(texture_size=lambda *x: setattr(app_instance.scontrino_label, 'height', app_instance.scontrino_label.texture_size[1]))
         scroll_scontrino.add_widget(app_instance.scontrino_label)
