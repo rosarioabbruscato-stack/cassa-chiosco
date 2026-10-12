@@ -100,14 +100,38 @@ class InterfacciaCassa:
         lbl_seq_guida = Label(text="Reparti Rapidi (Sequenza: Clicca Reparto -> Numero -> Q.tà -> Numero -> Prezzo/Conferma)", size_hint_y=None, height=18, font_size='10sp', color=(0.4, 0.4, 0.4, 1))
         right_box.add_widget(lbl_seq_guida)
         
-        # Griglia reparti (font_size ottimizzato a 11sp per far stare comodamente "NON ALIMENTARI" e gli altri)
+        # Griglia 12 Slot Fissi Reparti da Database (Palette Pantone)
         reparti_grid = GridLayout(cols=4, spacing=8, size_hint_y=None, height=160)
-        reparti = []
-        for rep in reparti:
-            b = CustomButton(text=rep, bg_color=COLORI_REPARTI.get(rep, (0.7, 0.7, 0.7, 1)), color=(0.1, 0.1, 0.1, 1), font_size='11sp', bold=True)
-            b.bind(on_press=lambda instance, r=rep: app_instance.seleziona_reparto(r))
-            reparti_grid.add_widget(b)
-        reparti_grid.add_widget(CustomButton(text="", disabled=True, bg_color=(0,0,0,0)))
+        app_instance.grid_reparti_pos = reparti_grid
+
+        def popola_reparti_db():
+            reparti_grid.clear_widgets()
+            import sqlite3
+            conn = sqlite3.connect('database/negozio.db')
+            cursor = conn.cursor()
+            cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
+            rows = cursor.fetchall()
+            conn.close()
+
+            for row in rows:
+                r_id, r_nome, r_attivo, r_standby, cr, cg, cb, ca = row
+                nome_visualizzato = r_nome.rip() if hasattr(r_nome, 'rip') else (r_nome.strip() if r_nome and r_nome.strip() else f'Slot {r_id}')
+                
+                if not r_attivo:
+                    b = CustomButton(text=f"{nome_visualizzato} (Disatt.)", bg_color=(0.25, 0.25, 0.25, 0.5), color=(0.7, 0.7, 0.7, 1), bold=False, font_size='10sp')
+                    b.disabled = True
+                elif r_standby:
+                    b = CustomButton(text=f"{nome_visualizzato} [STANDBY]", bg_color=(0.4, 0.4, 0.4, 1), color=(0.9, 0.9, 0.9, 1), bold=True, font_size='10sp')
+                    b.disabled = True
+                else:
+                    b = CustomButton(text=str(nome_visualizzato), bg_color=(cr, cg, cb, ca), color=(1, 1, 1, 1), bold=True, font_size='11sp')
+                    b.bind(on_press=lambda instance, r_nome=nome_visualizzato: app_instance.seleziona_reparto(r_nome))
+
+                reparti_grid.add_widget(b)
+
+        popola_reparti_db()
+        app_instance.aggiorna_griglia_reparti_pos = popola_reparti_db
+
         right_box.add_widget(reparti_grid)
         
         tastierino_layout = BoxLayout(orientation='horizontal', spacing=10)
