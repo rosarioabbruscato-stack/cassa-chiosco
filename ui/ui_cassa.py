@@ -44,9 +44,36 @@ class InterfacciaCassa:
         scroll_scontrino.add_widget(app_instance.scontrino_label)
         left_box.add_widget(scroll_scontrino)
         
-        app_instance.btn_azione_scontrino = CustomButton(text="Elimina Riga Selezionata", bg_color=(0.9, 0.25, 0.25, 1), size_hint_y=None, height=40, bold=True, font_size='14sp')
-        app_instance.btn_azione_scontrino.bind(on_press=app_instance.gestisci_azione_scontrino)
-        left_box.add_widget(app_instance.btn_azione_scontrino)
+        # Contenitore orizzontale per i due pulsanti affiancati
+        layout_due_btn = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=5)
+
+        app_instance.btn_elimina_riga = CustomButton(
+            text='ELIMINA RIGA', 
+            bg_color=(0.9, 0.25, 0.25, 1), 
+            size_hint_y=None, 
+            height=40, 
+            bold=True, 
+            font_size='13sp'
+        )
+        app_instance.btn_elimina_riga.bind(on_press=app_instance.gestisci_azione_scontrino)
+
+        app_instance.btn_stampa_scontrino = CustomButton(
+            text='STAMPA', 
+            bg_color=(0.85, 0.2, 0.2, 1), 
+            size_hint_y=None, 
+            height=40, 
+            bold=True, 
+            font_size='13sp'
+        )
+        # Colleghiamo a un metodo di stampa manuale o generica se presente, o gestisci_azione_scontrino
+        if hasattr(app_instance, 'stampa_scontrino_manuale'):
+            app_instance.btn_stampa_scontrino.bind(on_press=app_instance.stampa_scontrino_manuale)
+
+        layout_due_btn.add_widget(app_instance.btn_elimina_riga)
+        layout_due_btn.add_widget(app_instance.btn_stampa_scontrino)
+        left_box.add_widget(layout_due_btn)
+        
+        app_instance.btn_azione_scontrino = app_instance.btn_elimina_riga
         
         tot_box = BoxLayout(orientation='vertical', size_hint_y=None, height=50, spacing=2)
         app_instance.lbl_totale = Label(text=f"TOTALE: {app_instance.valuta_corrente} 0.00", font_size='18sp', bold=True, halign='right', color=(0.1, 0.1, 0.1, 1))
