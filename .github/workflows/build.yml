@@ -7,17 +7,23 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: kivy/buildozer:latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer -v android debug
-          buildozer_version: stable
-      - name: Upload APK
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fix directory permissions
+        run: |
+          git config --global --add safe.directory /__w/cassa-chiosco/cassa-chiosco
+
+      - name: Build APK with Buildozer
+        run: |
+          buildozer -v android debug
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: cassa-chiosco-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
