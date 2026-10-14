@@ -8,13 +8,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: kivy/buildozer:latest
+    container:
+      image: kivy/buildozer:latest
+      options: --user root
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Fix directory permissions
+      - name: Fix git safe directory
         run: |
           git config --global --add safe.directory /__w/cassa-chiosco/cassa-chiosco
 
