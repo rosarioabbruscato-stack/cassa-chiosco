@@ -1,28 +1,12 @@
-from utils.printer import stampa_scontrino_rawbt
-from kivy.uix.floatlayout import FloatLayout
-from kivy.core.window import Window
-Window.clearcolor = (0, 0, 0, 1)
 from datetime import datetime
 import sqlite3
-from kivy.config import Config
-
-# Imposta la risoluzione fissa della finestra per simulare il tablet
-Config.set('graphics', 'width', '1920')
-Config.set('graphics', 'height', '1200')
-Config.set('graphics', 'resizable', True)
-
 from kivy.app import App
-Window.softinput_mode = "pan"
 from kivy.uix.boxlayout import BoxLayout
-from ui.ui_cassa import InterfacciaCassa
+from ui_cassa import InterfacciaCassa
 
 class CassaApp(App):
     def build(self):
-        # Forziamo le dimensioni della finestra a 1440x900 (16:10)
-        from kivy.core.window import Window
-        Window.size = (1280, 720)
-
-        self.db_name = "database/negozio.db"
+        self.db_name = "negozio.db"
         self.operatore_corrente = "Rosario Vincenzo"
         self.cassa_corrente = "Cassa Mobile Android"
         self.scontrino_righe = []
@@ -33,46 +17,19 @@ class CassaApp(App):
         self.valuta_corrente = "CHF"
         self.vendita_completata_flag = False
         self.title = "Cassa - Chiosco & Alimentari dell'Est"
-
-        self.root_layout = BoxLayout(orientation='vertical', padding=[24, 16, 24, 16], spacing=12)
-
+        
+        self.root_layout = BoxLayout(orientation='vertical', padding=16, spacing=12)
+        
         nav_layout = InterfacciaCassa.crea_menu_superiore(self)
         self.root_layout.add_widget(nav_layout)
-
+        
         self.content_container = BoxLayout(orientation='vertical')
         self.root_layout.add_widget(self.content_container)
-
+        
         self.inizializza_db_se_manca()
         self.mostra_schermata("vendita")
+        return self.root_layout
 
-        # Contenitore radice per il centramento geometrico con aspect ratio 16:10 rigoroso e sfondo BIANCO
-        root_aspect = FloatLayout()
-
-        with root_aspect.canvas.before:
-            from kivy.graphics import Color, Rectangle
-            Color(1, 1, 1, 1)
-            self.bg_rect = Rectangle(pos=root_aspect.pos, size=root_aspect.size)
-        root_aspect.bind(pos=lambda inst, val: setattr(self.bg_rect, 'pos', val))
-        root_aspect.bind(size=lambda inst, val: setattr(self.bg_rect, 'size', val))
-
-        self.root_layout.size_hint = (None, None)
-
-        def update_layout_geometry(inst, size):
-            parent_w, parent_h = size
-            if parent_h == 0 or parent_w == 0:
-                return
-            # Calcoliamo basandoci rigorosamente sul rapporto 16:10 (1.6) con margine di sicurezza perimetrale
-            target_w = parent_w * 0.95
-            target_h = target_w / 1.6
-            if target_h > parent_h * 0.95:
-                target_h = parent_h * 0.95
-                target_w = target_h * 1.6
-            inst.size = (target_w, target_h)
-            inst.pos = ((parent_w - target_w) / 2, (parent_h - target_h) / 2)
-
-        root_aspect.bind(size=lambda inst, val: update_layout_geometry(self.root_layout, val))
-        root_aspect.add_widget(self.root_layout)
-        return root_aspect
     def inizializza_db_se_manca(self):
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
@@ -129,7 +86,7 @@ class CassaApp(App):
         query = self.input_codice.text.strip()
         if self.prezzo_forzato is not None:
             prezzo_unitario = self.prezzo_forzato
-            nome_prod = f"{self.reparto_selezionato}" if not query else query
+            nome_prod = f"Reparto {self.reparto_selezionato}" if not query else query
             totale_riga = prezzo_unitario * self.moltiplicatore_qta
             riga = f"{self.moltiplicatore_qta}x {nome_prod[:14]:<14} {self.valuta_corrente} {totale_riga:.2f}"
             self.scontrino_righe.append((riga, totale_riga))
@@ -207,8 +164,7 @@ class CassaApp(App):
         conn.commit()
         conn.close()
         
-        # Rimossa stampa automatica su Cash/Carta/Twint
-        # self.esegui_stampa_termica(dettagli, self.totale_generale, pagamento)
+        self.esegui_stampa_termica(dettagli, self.totale_generale, pagamento)
         
         self.vendita_completata_flag = True
         self.lbl_stato_corrente.text = f"Vendita completata ({pagamento}) - Scontrino in verifica"
@@ -223,29 +179,13 @@ class CassaApp(App):
         self.aggiorna_vista_scontrino()
         self.lbl_stato_corrente.text = "Pronto per nuova vendita"
         self.btn_azione_scontrino.text = "Elimina Riga Selezionata"
-
-
-    def stampa_scontrino_manuale(self, *args):
-        if not self.scontrino_righe:
-            self.lbl_stato_corrente.text = "Impossibile stampare: scontrino vuoto"
-            return
-        righe = [f"Cassa: {self.cassa_corrente}", f"Op: {self.operatore_corrente}", "-" * 32]
-        for r in self.scontrino_righe:
-            righe.append(str(r[0]))
-        righe.append("-" * 32)
-        righe.append(f"TOTALE: CHF {self.totale_generale:.2f}")
-        testo = "\n".join(righe) + "\n"
-        try:
-            stampa_scontrino_rawbt(testo)
-            self.lbl_stato_corrente.text = "Scontrino inviato a RawBT"
-        except Exception as e:
-            self.lbl_stato_corrente.text = f"Errore stampa RawBT: {e}"
+        self.btn_azione_scontrino.set_color((0.9, 0.25, 0.25, 1))
 
     def esegui_stampa_termica(self, dettagli, totale, pagamento):
         pass
 
     def esegui_chiusura_z(self, *args):
-        self.lbl_stato_corrente.text = "Chiusura Z calcolata e registrata con successo"
+        self.lbl_stato_corrente.text = "Chiusura Z calcolata e registrata con successo!"
 
 if __name__ == '__main__':
     CassaApp().run()

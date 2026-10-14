@@ -42,7 +42,8 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,pyjnius,plyer,openpyxl,et_xmlfile 
+requirements = python3,kivy,pyjnius
+
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
@@ -305,7 +306,7 @@ android.allow_backup = True
 # android.manifest_placeholders = [:]
 
 # (bool) Skip byte compile for .py files
-android.no-byte-compile-python = True
+# android.no-byte-compile-python = False
 
 # (str) The format used to package the app for release mode (aab or apk or aar).
 # android.release_artifact = aab
@@ -318,7 +319,6 @@ android.no-byte-compile-python = True
 # Available options for Android API >= 28 are "default, shortEdges, never" and defaults to never.
 # Android documentation: https://developer.android.com/develop/ui/views/layout/display-cutout
 #android.display_cutout = never
-android.architectures = arm64-v8a
 
 #
 # Python for android (p4a) specific
