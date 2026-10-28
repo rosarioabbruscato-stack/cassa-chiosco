@@ -32,10 +32,10 @@ class InterfacciaCassa:
 
     @staticmethod
     def crea_schermata_vendita(app_instance):
-        layout = BoxLayout(orientation='horizontal', padding=0, spacing=20)
+        layout = BoxLayout(orientation='horizontal', padding=[20, 10, 20, 10], spacing=20)
         
         # --- COLONNA DI SINISTRA ---
-        left_box = BoxLayout(orientation='vertical', padding=15, spacing=10, size_hint_x=0.50)
+        left_box = BoxLayout(orientation='vertical', padding=[20, 10, 20, 10], spacing=10, size_hint_x=0.48)
         
         scroll_scontrino = ScrollView()
         app_instance.scontrino_label = Label(text="Scontrino Vuoto", font_name="DejaVuSansMono" if "RobotoMono" in ["RobotoMono"] else "Courier", font_size='13sp', halign='left', valign='top', size_hint_y=None, color=(0.2, 0.2, 0.2, 1))
@@ -117,7 +117,7 @@ class InterfacciaCassa:
         layout.add_widget(left_box)
         
         # --- COLONNA DI DESTRA (Reparti con font ridotto a 11sp) ---
-        right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.50)
+        right_box = BoxLayout(orientation='vertical', spacing=10, size_hint_x=0.48)
         app_instance.input_codice = TextInput(text="", hint_text="Input / Tastierino / Barcode", multiline=False, size_hint_y=None, height=46, font_size='16sp')
         right_box.add_widget(app_instance.input_codice)
         
