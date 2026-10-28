@@ -9,7 +9,7 @@
 title = My Application
 
 # (str) Package name
-package.name = myapp
+package.name = cassachiosco
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -42,7 +42,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,pyjnius
+requirements = python3,kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -455,7 +455,7 @@ warn_on_root = 1
 #   Warning: Indented text is treated as a multiline string - i.e.
 #       [app]
 #       title = My Application
-#          package.name = myapp # This is all part of the title.
+#          package.name = cassachiosco # This is all part of the title.
 #
 #   Buildozer's .spec files have some additional features:
 #
