@@ -49,7 +49,7 @@ class InterfacciaCassa:
 
         app_instance.btn_elimina_riga = CustomButton(
             text='ELIMINA RIGA', 
-            bg_color=(0.2, 0.5, 0.8, 1), 
+            bg_color=(0.9, 0.25, 0.25, 1), 
             size_hint_y=None, 
             height=40, 
             bold=True, 
@@ -59,7 +59,7 @@ class InterfacciaCassa:
 
         app_instance.btn_stampa_scontrino = CustomButton(
             text='STAMPA', 
-            bg_color=(0.9, 0.25, 0.25, 1), 
+            bg_color=(0.85, 0.2, 0.2, 1), 
             size_hint_y=None, 
             height=40, 
             bold=True, 
