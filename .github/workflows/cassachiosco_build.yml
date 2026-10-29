@@ -20,30 +20,7 @@ jobs:
           sudo add-apt-repository universe
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            git \
-            ffmpeg \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev \
-            libswscale-dev \
-            libavformat-dev \
-            libavcodec-dev \
-            zlib1g-dev \
-            libffi-dev \
-            libssl-dev \
-            autoconf \
-            libtool \
-            pkg-config \
-            default-jdk \
-            zip \
-            unzip \
-            libncurses6:i386 \
-            libstdc++6:i386 \
-            zlib1g:i386
+          sudo apt-get install -y             build-essential             git             ffmpeg             libsdl2-dev             libsdl2-image-dev             libsdl2-mixer-dev             libsdl2-ttf-dev             libportmidi-dev             libswscale-dev             libavformat-dev             libavcodec-dev             zlib1g-dev             libffi-dev             libssl-dev             autoconf             libtool             pkg-config             default-jdk             zip             unzip             libncurses6:i386             libstdc++6:i386             zlib1g:i386
 
       - name: Install Buildozer and Cython
         run: |
