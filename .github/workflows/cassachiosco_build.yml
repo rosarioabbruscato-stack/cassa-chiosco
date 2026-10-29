@@ -30,13 +30,10 @@ jobs:
       - name: Build APK with Buildozer
         run: |
           buildozer -v android debug || {
-            echo '=== ERRORE RILEVATO: CERCO I LOG DI BUILDOZER ==='
-            find . -name 'build.log' -o -name '*.log' | while read logfile; do
-              echo '--------------------------------------------------'
-              echo 'FILE TROVATO: $logfile'
-              echo '--------------------------------------------------'
-              tail -n 100 "$logfile"
-            done
+            echo '=== MOSTRO GLI ULTIMI LOG DI BUILDOZER ==='
+            if [ -d .buildozer/android/platform ]; then
+              find .buildozer/android/platform -name '*.log' -exec echo '--- {} ---' \; -exec tail -n 60 {} \;
+            fi
             exit 1
           }
 
