@@ -30,18 +30,10 @@ jobs:
       - name: Build APK with Buildozer
         run: |
           buildozer -v android debug || {
-            echo 'Build fallita, salvo i log per l''analisi...'
-            mkdir -p build_logs
-            find .buildozer -name '*.log' -exec cp {} build_logs/ \; 2>/dev/null || true
+            echo '=== STAMPA DIRETTA DEGLI ULTIMI LOG DI ERRORE ==='
+            find .buildozer -name '*.log' -exec tail -n 100 {} \;
             exit 1
           }
-
-      - name: Upload Build Logs if Failed
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: error-logs
-          path: build_logs/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
