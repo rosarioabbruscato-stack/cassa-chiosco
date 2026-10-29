@@ -1,4 +1,4 @@
-name: Build Kivy APK Diagnostica
+name: CassaChiosco Build
 
 on:
   push:
@@ -25,9 +25,9 @@ jobs:
           pip install --upgrade pip
           pip install cython==0.29.36 buildozer
 
-      - name: Build with Buildozer (with debug log output)
+      - name: Build with Buildozer
         run: |
-          buildozer -v android debug || (echo "=== BUILD FALLITA - MOSTRO LOG BUILDER ===" && cat .buildozer/android/platform/build-*.log 2>/dev/null || true) && exit 1
+          buildozer -v android debug || (echo "=== LOG ERRORE BUILDESER ===" && cat .buildozer/android/platform/build-*.log 2>/dev/null || true) && exit 1
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
