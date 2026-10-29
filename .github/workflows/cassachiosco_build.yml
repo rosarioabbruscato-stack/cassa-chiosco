@@ -27,7 +27,11 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          buildozer -v android debug || (echo "=== LOG ERRORE BUILDOZER ===" && cat .buildozer/android/platform/build-*.log 2>/dev/null || true) && exit 1
+          buildozer -v android debug || {
+            echo '=== BUILD FALLITA - CERCO I LOG ==='
+            find .buildozer -name '*.log' -exec echo '--- FILE: {} ---' \; -exec cat {} \;
+            exit 1
+          }
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
