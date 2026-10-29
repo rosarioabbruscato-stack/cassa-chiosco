@@ -31,11 +31,7 @@ jobs:
         run: |
           buildozer -v android debug || {
             echo '=== INIZIO ANALISI ERRORE BUILDOZER ==='
-            if [ -d .buildozer/android/platform/build-aarch64/build/other_builds ]; then
-              find .buildozer -name '*.log' -print -exec tail -n 50 {} \;
-            else
-              find . -name '*.log' -print -exec tail -n 50 {} \;
-            fi
+            find . -name '*.log' -print -exec tail -n 50 {} \;
             echo '=== FINE ANALISI ERRORE ==='
             exit 1
           }
