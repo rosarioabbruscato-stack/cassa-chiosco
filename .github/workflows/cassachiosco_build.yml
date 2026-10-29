@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool pkg-java
+          sudo apt-get install -y             build-essential             git             ffmpeg             libsdl2-dev             libsdl2-image-dev             libsdl2-mixer-dev             libsdl2-ttf-dev             libportmidi-dev             libswscale-dev             libavformat-dev             libavcodec-dev             zlib1g-dev             libffi-dev             libssl-dev             autoconf             libtool             pkg-config             default-jdk             zip             unzip
 
       - name: Install Buildozer and Cython
         run: |
@@ -27,7 +27,7 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          buildozer -v android debug || (echo "=== LOG ERRORE BUILDESER ===" && cat .buildozer/android/platform/build-*.log 2>/dev/null || true) && exit 1
+          buildozer -v android debug || (echo "=== LOG ERRORE BUILDOZER ===" && cat .buildozer/android/platform/build-*.log 2>/dev/null || true) && exit 1
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
