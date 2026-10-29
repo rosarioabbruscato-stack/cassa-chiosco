@@ -30,8 +30,13 @@ jobs:
       - name: Build APK with Buildozer
         run: |
           buildozer -v android debug || {
-            echo '=== STAMPA DIRETTA DEGLI ULTIMI LOG DI ERRORE ==='
-            find . -name '*.log' -exec tail -n 100 {} \;
+            echo '=== INIZIO ANALISI ERRORE BUILDOZER ==='
+            if [ -d .buildozer/android/platform/build-aarch64/build/other_builds ]; then
+              find .buildozer -name '*.log' -print -exec tail -n 50 {} \;
+            else
+              find . -name '*.log' -print -exec tail -n 50 {} \;
+            fi
+            echo '=== FINE ANALISI ERRORE ==='
             exit 1
           }
 
