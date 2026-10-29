@@ -1,4 +1,4 @@
-name: Build Kivy APK
+name: Build Kivy APK Diagnostica
 
 on:
   push:
@@ -8,28 +8,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+      - uses: actions/checkout@v4
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y           build-essential           git           ffmpeg           libsdl2-dev           libsdl2-image-dev           libsdl2-mixer-dev           libsdl2-ttf-dev           libportmidi-dev           libswscale-dev           libavformat-dev           libavcodec-dev           zlib1g-dev           libffi-dev           libssl-dev           autoconf           libtool           pkg-config
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-    - name: Install Buildozer and Cython
-      run: |
-        pip install --upgrade pip
-        pip install cython==0.29.36 buildozer
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool pkg-java
 
-    - name: Build with Buildozer
-      run: buildozer -v android debug
+      - name: Install Buildozer and Cython
+        run: |
+          pip install --upgrade pip
+          pip install cython==0.29.36 buildozer
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: package
-        path: bin/*.apk
+      - name: Build with Buildozer (with debug log output)
+        run: |
+          buildozer -v android debug || (echo "=== BUILD FALLITA - MOSTRO LOG BUILDER ===" && cat .buildozer/android/platform/build-*.log 2>/dev/null || true) && exit 1
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: bin/*.apk
