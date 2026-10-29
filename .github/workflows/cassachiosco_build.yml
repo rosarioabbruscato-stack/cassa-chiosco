@@ -31,7 +31,7 @@ jobs:
         run: |
           buildozer -v android debug || {
             echo '=== STAMPA DIRETTA DEGLI ULTIMI LOG DI ERRORE ==='
-            find .buildozer -name '*.log' -exec tail -n 100 {} \;
+            find . -name '*.log' -exec tail -n 100 {} \;
             exit 1
           }
 
