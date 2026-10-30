@@ -29,12 +29,17 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          buildozer -v android debug || {
-            echo '=== INIZIO ANALISI ERRORE BUILDOZER ==='
-            find . -name '*.log' -print -exec tail -n 50 {} \;
-            echo '=== FINE ANALISI ERRORE ==='
-            exit 1
-          }
+          buildozer -v android debug
+
+      - name: Upload Build Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            .buildozer/**/*.log
+            .buildozer/android/platform/build-arm64-v8a/build/build.log
+            bin/*.log
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
