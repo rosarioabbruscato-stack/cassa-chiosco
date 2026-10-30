@@ -36,6 +36,7 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
+          buildozer clean || true
           buildozer -v android debug || { find . -name "build.log" -exec echo "=== LOG FOUND: {} ===" \; -exec tail -n 150 {} \; ; exit 1; } || {
             echo '=== CERCO IL LOG DI BUILD DI BUILDOZER ==='
             find .buildozer -name 'build.log' -exec cat {} + || true
