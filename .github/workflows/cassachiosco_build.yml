@@ -36,13 +36,11 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          buildozer -v android debug > build_output.log 2>&1 || true
-
-      - name: Upload Build Log Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-error-log
-          path: build_output.log
+          buildozer -v android debug > build_output.log 2>&1 || {
+            echo '=== ERRORE RILEVATO NEL LOG DI BUILDCOZER ==='
+            grep -i -C 5 "error" build_output.log || tail -n 100 build_output.log
+            exit 1
+          }
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
