@@ -36,10 +36,9 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          buildozer -v android debug > build_output.log 2>&1 || {
-            echo '=== INIZIO LOG ERRORE BUILDER ==='
-            tail -n 120 build_output.log
-            echo '=== FINE LOG ERRORE BUILDER ==='
+          buildozer -v android debug || {
+            echo '=== CERCO IL LOG DI BUILD DI BUILDOZER ==='
+            find .buildozer -name 'build.log' -exec cat {} + || true
             exit 1
           }
 
