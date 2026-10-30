@@ -29,7 +29,14 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          yes | buildozer android debug
+          yes | buildozer android debug || {
+            echo '=== COPIA INTEGRALE DEL LOG DI ERRORE ==='
+            find . -name 'build.log' -o -name '*.log' | while read logfile; do
+              echo '--- 📁 FILE: $logfile ---'
+              tail -n 150 "$logfile"
+            done
+            exit 1
+          }
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
