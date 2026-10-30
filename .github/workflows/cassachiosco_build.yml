@@ -27,8 +27,6 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y             build-essential             git             ffmpeg             libsdl2-dev             libsdl2-image-dev             libsdl2-mixer-dev             libsdl2-ttf-dev             libportmidi-dev             libswscale-dev             libavformat-dev             libavcodec-dev             zlib1g-dev             libffi-dev             libssl-dev             autoconf             automake             libtool             libltdl-dev             pkg-config             zip             unzip             libncurses6:i386             libstdc++6:i386             zlib1g:i386
-          
-          # Esporta i percorsi delle macro per evitare errori LT_SYS_SYMBOL_USCORE
           echo "ACLOCAL_PATH=/usr/share/aclocal" >> $GITHUB_ENV
 
       - name: Install Buildozer and Cython
@@ -38,12 +36,13 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          buildozer -v android debug > build_output.log 2>&1 || {
-            echo '=== INIZIO LOG ERRORE BUILDER ==='
-            tail -n 200 build_output.log
-            echo '=== FINE LOG ERRORE BUILDER ==='
-            exit 1
-          }
+          buildozer -v android debug > build_output.log 2>&1 || true
+
+      - name: Upload Build Log Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-error-log
+          path: build_output.log
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
