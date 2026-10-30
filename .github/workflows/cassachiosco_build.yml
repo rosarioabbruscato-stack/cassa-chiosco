@@ -15,12 +15,18 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Set up Java 11 (Mandatory for NDK 25b)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
       - name: Install system dependencies
         run: |
           sudo add-apt-repository universe
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y             build-essential             git             ffmpeg             libsdl2-dev             libsdl2-image-dev             libsdl2-mixer-dev             libsdl2-ttf-dev             libportmidi-dev             libswscale-dev             libavformat-dev             libavcodec-dev             zlib1g-dev             libffi-dev             libssl-dev             autoconf             libtool             pkg-config             default-jdk             zip             unzip             libncurses6:i386             libstdc++6:i386             zlib1g:i386
+          sudo apt-get install -y             build-essential             git             ffmpeg             libsdl2-dev             libsdl2-image-dev             libsdl2-mixer-dev             libsdl2-ttf-dev             libportmidi-dev             libswscale-dev             libavformat-dev             libavcodec-dev             zlib1g-dev             libffi-dev             libssl-dev             autoconf             libtool             pkg-config             zip             unzip             libncurses6:i386             libstdc++6:i386             zlib1g:i386
 
       - name: Install Buildozer and Cython
         run: |
@@ -29,14 +35,7 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          yes | buildozer android debug || {
-            echo '=== COPIA INTEGRALE DEL LOG DI ERRORE ==='
-            find . -name 'build.log' -o -name '*.log' | while read logfile; do
-              echo '--- 📁 FILE: $logfile ---'
-              tail -n 150 "$logfile"
-            done
-            exit 1
-          }
+          buildozer -v android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
