@@ -35,27 +35,27 @@ class SchermataChiusura(BoxLayout):
         # Riga 2: Pulsanti di controllo disposti in modo fluido
         btn_layout = BoxLayout(size_hint_y=None, height=55, spacing=8)
         
-        self.btn_nuova_cassa = Button(text='+ Cassa', font_size=13, background_color=(0.2, 0.5, 0.8, 1))
+        self.btn_nuova_cassa = Button(text='+ Cassa', font_size=13, background_normal="", background_color=(0.2, 0.5, 0.8, 1))
         self.btn_nuova_cassa.bind(on_press=self.apri_popup_crea_cassa)
         btn_layout.add_widget(self.btn_nuova_cassa)
 
-        self.btn_nuovo_cassiere = Button(text='+ Cassiere', font_size=13, background_color=(0.3, 0.6, 0.3, 1))
+        self.btn_nuovo_cassiere = Button(text='+ Cassiere', font_size=13, background_normal="", background_color=(0.3, 0.6, 0.3, 1))
         self.btn_nuovo_cassiere.bind(on_press=self.apri_popup_crea_cassiere)
         btn_layout.add_widget(self.btn_nuovo_cassiere)
 
-        self.btn_turno = Button(text='Apri Turno', font_size=13, background_color=(0.1, 0.4, 0.7, 1))
+        self.btn_turno = Button(text='Apri Turno', font_size=13, background_normal="", background_color=(0.1, 0.4, 0.7, 1))
         self.btn_turno.bind(on_press=self.apri_popup_turno)
         btn_layout.add_widget(self.btn_turno)
         
-        self.btn_backup = Button(text='Backup DB', font_size=13, background_color=(0.5, 0.3, 0.7, 1))
+        self.btn_backup = Button(text='Backup DB', font_size=13, background_normal="", background_color=(0.5, 0.3, 0.7, 1))
         self.btn_backup.bind(on_press=self.fai_backup_db)
         btn_layout.add_widget(self.btn_backup)
         
-        self.btn_chiusura_z = Button(text='Chiusura Z', font_size=13, background_color=(0.8, 0.2, 0.5, 1))
+        self.btn_chiusura_z = Button(text='Chiusura Z', font_size=13, background_normal="", background_color=(0.8, 0.2, 0.5, 1))
         self.btn_chiusura_z.bind(on_press=self.esegui_chiusura_z)
         btn_layout.add_widget(self.btn_chiusura_z)
 
-        self.btn_gestione_pos = Button(text='Gestione POS', font_size=12, background_color=(0.1, 0.5, 0.8, 1))
+        self.btn_gestione_pos = Button(text='Gestione POS', font_size=12, background_normal="", background_color=(0.1, 0.5, 0.8, 1))
         self.btn_gestione_pos.bind(on_press=self.apri_gestione_pulsanti_pos)
         btn_layout.add_widget(self.btn_gestione_pos)
 
@@ -112,7 +112,7 @@ class SchermataChiusura(BoxLayout):
         txt_pin = TextInput(text='', password=True, multiline=False, size_hint_y=None, height=40)
         content.add_widget(txt_pin)
 
-        btn_salva = Button(text='Salva Cassa', size_hint_y=None, height=45, background_color=(0.2, 0.6, 0.2, 1))
+        btn_salva = Button(text='Salva Cassa', size_hint_y=None, height=45, background_normal="", background_color=(0.2, 0.6, 0.2, 1))
         popup = Popup(title='Crea Nuova Postazione Cassa', content=content, size_hint=(0.8, 0.5))
 
         def salva(btn):
@@ -143,7 +143,7 @@ class SchermataChiusura(BoxLayout):
         txt_pin = TextInput(text='', password=True, multiline=False, size_hint_y=None, height=40)
         content.add_widget(txt_pin)
 
-        btn_salva = Button(text='Salva Cassiere', size_hint_y=None, height=45, background_color=(0.2, 0.6, 0.2, 1))
+        btn_salva = Button(text='Salva Cassiere', size_hint_y=None, height=45, background_normal="", background_color=(0.2, 0.6, 0.2, 1))
         popup = Popup(title='Crea Nuovo Cassiere', content=content, size_hint=(0.8, 0.5))
 
         def salva(btn):
@@ -189,7 +189,7 @@ class SchermataChiusura(BoxLayout):
         txt_pin_login = TextInput(text='', password=True, multiline=False, size_hint_y=None, height=45)
         content.add_widget(txt_pin_login)
         
-        btn_conferma = Button(text='Verifica PIN e Apri Turno', size_hint_y=None, height=45, background_color=(0.2, 0.6, 0.2, 1))
+        btn_conferma = Button(text='Verifica PIN e Apri Turno', size_hint_y=None, height=45, background_normal="", background_color=(0.2, 0.6, 0.2, 1))
         popup = Popup(title='Apertura Turno con PIN', content=content, size_hint=(0.8, 0.7))
         
         def conferma(btn):
@@ -325,13 +325,13 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
                 else:
                     stato_txt = 'Disattivato'
 
-                btn_stato = Button(text=stato_txt, size_hint_x=0.2, background_color=(0.3, 0.3, 0.3, 1))
+                btn_stato = Button(text=stato_txt, size_hint_x=0.2, background_normal="", background_color=(0.3, 0.3, 0.3, 1))
 
                 colore_attuale_nome = trova_nome_pantone(cr, cg, cb)
-                btn_colore = Button(text=colore_attuale_nome, size_hint_x=0.25, background_color=(cr, cg, cb, ca))
+                btn_colore = Button(text=colore_attuale_nome, size_hint_x=0.25, background_normal="", background_color=(cr, cg, cb, ca))
 
-                btn_salva = Button(text='Salva', background_color=(0.2, 0.7, 0.3, 1), size_hint_x=0.12)
-                btn_elimina = Button(text='Elimina', background_color=(0.8, 0.2, 0.2, 1), size_hint_x=0.08)
+                btn_salva = Button(text='Salva', background_normal="", background_color=(0.2, 0.7, 0.3, 1), size_hint_x=0.12)
+                btn_elimina = Button(text='Elimina', background_normal="", background_color=(0.8, 0.2, 0.2, 1), size_hint_x=0.08)
 
                 colore_ref = {'rgba': (cr, cg, cb, ca)}
 
@@ -364,7 +364,7 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
                             b_col.background_color = prgba
                             pop_p.dismiss()
                         
-                        bc = Button(text=p_nome, background_color=p_rgba, size_hint_y=None, height=40, font_size=14)
+                        bc = Button(text=p_nome, background_normal="", background_color=p_rgba, size_hint_y=None, height=40, font_size=14)
                         bc.bind(on_press=imposta_colore)
                         grid_p.add_widget(bc)
                     
@@ -430,7 +430,7 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
         sv.add_widget(grid_slot)
         content.add_widget(sv)
 
-        btn_chiudi = Button(text='Chiudi Pannello', size_hint_y=None, height=50, background_color=(0.3, 0.3, 0.3, 1))
+        btn_chiudi = Button(text='Chiudi Pannello', size_hint_y=None, height=50, background_normal="", background_color=(0.3, 0.3, 0.3, 1))
         popup = Popup(title='Gestione Pulsanti POS (12 Slot Fissi - Pantone)', content=content, size_hint=(0.9, 0.85))
         btn_chiudi.bind(on_press=popup.dismiss)
         content.add_widget(btn_chiudi)
