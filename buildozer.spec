@@ -460,7 +460,7 @@ warn_on_root = 1
 #
 #   Buildozer supports lists - i.e.
 #       [app]
-#       source.include_exts = py,png,jpg
+#       source.include_exts = py,png,jpg,kv,atlas,ttf
 #       #                     ^ This is a list.
 #
 #       [app:source.include_exts]
