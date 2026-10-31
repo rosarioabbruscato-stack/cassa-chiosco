@@ -1,3 +1,7 @@
+import os
+os.environ['KIVY_WINDOW'] = 'x11'
+os.environ['KIVY_GL_BACKEND'] = 'gl'
+
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
@@ -31,25 +35,15 @@ class CassaApp(App):
         self.reparto_selezionato = "GENERALE"
         self.moltiplicatore_qta = 1
         self.vendita_completata_flag = False
-        self.root_layout = BoxLayout(orientation='vertical', size_hint=(None, None))
+        
+        self.root_layout = BoxLayout(orientation='vertical')
         self.root_layout.add_widget(InterfacciaCassa.crea_menu_superiore(self))
         self.content_container = BoxLayout(orientation='vertical')
         self.root_layout.add_widget(self.content_container)
+        
         self.inizializza_db_se_manca()
         self.mostra_schermata("vendita")
-        # Margine simmetrico: riduciamo leggermente la larghezza al 96% e centriamo per avere un bordo uguale a destra e sinistra
-        root_aspect = FloatLayout()
-        def update_layout_geometry(inst, size):
-            parent_w, parent_h = size
-            if parent_h == 0 or parent_w == 0: return
-            target_w = parent_w * 0.94
-            target_h = parent_h * 0.96
-            inst.size = (target_w, target_h)
-            inst.pos = ((parent_w - target_w) / 2, (parent_h - target_h) / 2)
-        root_aspect.bind(size=lambda inst, val: update_layout_geometry(self.root_layout, val))
-        root_aspect.add_widget(self.root_layout)
-        return root_aspect
-
+        return self.root_layout
     def inizializza_db_se_manca(self):
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
