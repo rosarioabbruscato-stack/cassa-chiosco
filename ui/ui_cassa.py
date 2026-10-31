@@ -131,7 +131,16 @@ class InterfacciaCassa:
         reparti_grid = GridLayout(cols=4, spacing=8, size_hint_y=None, height=160)
         app_instance.grid_reparti_pos = reparti_grid
 
-        def popola_reparti_db():
+        
+        # [AUTOPATCH] Assicura che la tabella config_reparti esista
+        try:
+            cursor.execute("CREATE TABLE IF NOT EXISTS config_reparti (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT)")
+            connection.commit()
+        except Exception:
+            pass
+        
+
+def popola_reparti_db():
             reparti_grid.clear_widgets()
             import sqlite3
             conn = sqlite3.connect('database/negozio.db')

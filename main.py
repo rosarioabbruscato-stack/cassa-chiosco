@@ -106,4 +106,10 @@ class CassaApp(App):
                 self.lbl_resto.text = "RESTO: --"
 
 if __name__ == '__main__':
+    try:
     CassaApp().run()
+except Exception as e:
+    import traceback
+    with open("cassa_crash.txt", "w") as f:
+        traceback.print_exc(file=f)
+    raise
