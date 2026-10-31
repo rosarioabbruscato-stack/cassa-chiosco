@@ -34,7 +34,7 @@ source.include_exts = py,png,jpg,kv,atlas,ttf
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 0.2
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -75,7 +75,7 @@ orientation = landscape
 # author = © Copyright Info
 
 # Kivy version to use
-osx.kivy_version = 2.2.0
+osx.kivy_version = 0.2
 
 #
 # Android specific
@@ -121,7 +121,7 @@ android.minapi = 24
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 
-android.build_tools_version = 33.0.2
+android.build_tools_version = 0.2
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
 
@@ -290,7 +290,7 @@ android.accept_sdk_license = True
 
 # (int) overrides automatic versionCode computation (used in build.gradle)
 # this is not the same as app version and should only be edited if you know what you're doing
-# android.numeric_version = 1
+# android.numeric_version = 0.2
 
 # (bool) enables Android auto backup feature (Android API >=23)
 android.allow_backup = True
@@ -331,7 +331,7 @@ android.allow_backup = True
 
 # (str) python-for-android branch to use, defaults to master
 p4a.branch = v2024.01.21
-p4a.python_version = 3.11
+p4a.python_version = 0.2
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
@@ -492,4 +492,4 @@ warn_on_root = 1
 #
 #   Environment variable overrides have priority over profile overrides.
 android.ndk = 25.2.9519653
-android.ndk_version = 25b
+android.ndk_version = 0.2
