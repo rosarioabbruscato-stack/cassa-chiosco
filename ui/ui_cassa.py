@@ -282,3 +282,181 @@ class InterfacciaCassa(BoxLayout):
             self.add_widget(schermata)
         except Exception as e:
             print(f"[ERRORE] mostra_schermata: {e}")
+
+
+    def aggiorna_resto(self, instance, value):
+        self.check_stato()
+        try:
+            importo_ricevuto = float(value.replace(',', '.')) if value else 0.0
+        except ValueError:
+            importo_ricevuto = 0.0
+
+        totale_complessivo = sum(art.get('totale_riga', 0) for art in self.articoli_scontrino)
+        resto = importo_ricevuto - totale_complessivo
+
+        if hasattr(self, 'lbl_resto') and self.lbl_resto:
+            if importo_ricevuto >= totale_complessivo:
+                self.lbl_resto.text = f"Resto: CHF {resto:.2f}"
+            else:
+                self.lbl_resto.text = "Resto: Importo insufficiente"
+        print(f"DEBUG: Importo ricevuto={importo_ricevuto}, Totale={totale_complessivo}, Resto={resto}")
+
+
+    def check_stato(self):
+        if not hasattr(self, 'reparto_corrente'):
+            self.reparto_corrente = "ALIMENTARI"
+        if not hasattr(self, 'buffer_input'):
+            self.buffer_input = ""
+        if not hasattr(self, 'quantita_corrente'):
+            self.quantita_corrente = 1.0
+        if not hasattr(self, 'articoli_scontrino'):
+            self.articoli_scontrino = []
+        if not hasattr(self, 'pagamento_completato'):
+            self.pagamento_completato = False
+
+    def premi_tasto(self, valore):
+        self.check_stato()
+        if self.pagamento_completato:
+            self.articoli_scontrino = []
+            self.pagamento_completato = False
+
+        val_str = str(valore)
+        if val_str == "C":
+            self.buffer_input = ""
+            self.quantita_corrente = 1.0
+        elif val_str == ",":
+            if "." not in self.buffer_input:
+                self.buffer_input += "."
+        else:
+            self.buffer_input += val_str
+        print(f"DEBUG tastierino: buffer_input = {self.buffer_input}")
+
+    def aggiorna_resto(self, instance, value):
+        self.check_stato()
+        try:
+            importo_ricevuto = float(value.replace(',', '.')) if value else 0.0
+        except ValueError:
+            importo_ricevuto = 0.0
+
+        totale_complessivo = sum(art.get('totale_riga', 0) for art in self.articoli_scontrino)
+        resto = importo_ricevuto - totale_complessivo
+
+        if hasattr(self, 'lbl_resto') and self.lbl_resto:
+            if importo_ricevuto >= totale_complessivo:
+                self.lbl_resto.text = f"Resto: CHF {resto:.2f}"
+            else:
+                self.lbl_resto.text = "Resto: Importo insufficiente"
+        print(f"DEBUG: Importo ricevuto={importo_ricevuto}, Totale={totale_complessivo}, Resto={resto}")
+
+
+    def check_stato(self):
+        if not hasattr(self, 'reparto_corrente'):
+            self.reparto_corrente = "ALIMENTARI"
+        if not hasattr(self, 'buffer_input'):
+            self.buffer_input = ""
+        if not hasattr(self, 'quantita_corrente'):
+            self.quantita_corrente = 1.0
+        if not hasattr(self, 'articoli_scontrino'):
+            self.articoli_scontrino = []
+        if not hasattr(self, 'pagamento_completato'):
+            self.pagamento_completato = False
+
+    def premi_tasto(self, valore):
+        self.check_stato()
+        if self.pagamento_completato:
+            self.articoli_scontrino = []
+            self.pagamento_completato = False
+
+        val_str = str(valore)
+        if val_str == "C":
+            self.buffer_input = ""
+            self.quantita_corrente = 1.0
+        elif val_str == ",":
+            if "." not in self.buffer_input:
+                self.buffer_input += "."
+        else:
+            self.buffer_input += val_str
+        print(f"DEBUG tastierino: buffer_input = {self.buffer_input}")
+
+    def imposta_modalita(self, modo):
+        self.check_stato()
+        if modo == "QTA":
+            if self.buffer_input:
+                try:
+                    self.quantita_corrente = float(self.buffer_input.replace(',', '.'))
+                except ValueError:
+                    self.quantita_corrente = 1.0
+                self.buffer_input = ""
+            print(f"DEBUG: Quantità impostata a {self.quantita_corrente}")
+            
+        elif modo == "PREZZO":
+            prezzo_unitario = 0.0
+            if self.buffer_input:
+                try:
+                    prezzo_unitario = float(self.buffer_input.replace(',', '.'))
+                except ValueError:
+                    prezzo_unitario = 0.0
+
+            if prezzo_unitario > 0:
+                totale_riga = self.quantita_corrente * prezzo_unitario
+                articolo = {
+                    "reparto": self.reparto_corrente,
+                    "qta": self.quantita_corrente,
+                    "prezzo": prezzo_unitario,
+                    "totale_riga": totale_riga
+                }
+                self.articoli_scontrino.append(articolo)
+                print(f"DEBUG: Articolo aggiunto -> {articolo}")
+                
+                self.buffer_input = ""
+                self.quantita_corrente = 1.0
+                self.aggiorna_griglia_scontrino()
+
+    def cerca_e_aggiungi_prodotto(self):
+        self.imposta_modalita("PREZZO")
+
+    def aggiorna_resto(self, instance, value):
+        self.check_stato()
+        try:
+            importo_ricevuto = float(value.replace(',', '.')) if value else 0.0
+        except ValueError:
+            importo_ricevuto = 0.0
+
+        totale_complessivo = sum(art.get('totale_riga', 0) for art in self.articoli_scontrino)
+        resto = importo_ricevuto - totale_complessivo
+
+        if hasattr(self, 'lbl_resto') and self.lbl_resto:
+            if importo_ricevuto >= totale_complessivo:
+                self.lbl_resto.text = f"Resto: CHF {resto:.2f}"
+            else:
+                self.lbl_resto.text = "Resto: Importo insufficiente"
+        print(f"DEBUG: Importo ricevuto={importo_ricevuto}, Totale={totale_complessivo}, Resto={resto}")
+
+
+    def aggiorna_griglia_scontrino(self):
+        self.check_stato()
+        if hasattr(self, 'scontrino_label') and self.scontrino_label:
+            if not self.articoli_scontrino:
+                self.scontrino_label.text = "Scontrino Vuoto"
+            else:
+                linee = []
+                for art in self.articoli_scontrino:
+                    qta = art.get('qta', 1.0)
+                    prz = art.get('prezzo', 0.0)
+                    tot_riga = art.get('totale_riga', qta * prz)
+                    linee.append(f"• {art['reparto']} ({qta:g} x {prz:.2f}) = {tot_riga:.2f}")
+                self.scontrino_label.text = "\n".join(linee)
+                
+            if hasattr(self, 'lbl_totale') and self.lbl_totale:
+                totale_complessivo = sum(art.get('totale_riga', 0) for art in self.articoli_scontrino)
+                self.lbl_totale.text = f"TOTALE: {getattr(self, 'valuta_corrente', 'CHF')} {totale_complessivo:.2f}"
+
+
+    def completa_vendita(self, metodo_pagamento):
+        self.check_stato()
+        print(f"DEBUG: Pagamento completato con {metodo_pagamento}. Scontrino bloccato a schermo per verifica.")
+        self.pagamento_completato = True
+        self.buffer_input = ""
+        self.quantita_corrente = 1.0
+        if hasattr(self, 'lbl_stato_corrente') and self.lbl_stato_corrente:
+            self.lbl_stato_corrente.text = f"Pagamento ({metodo_pagamento}) completato. Scontrino in verifica."
