@@ -11,7 +11,14 @@ from ui.ui_styles import CustomButton, COLORI_REPARTI
 from kivy.metrics import dp
 
 
-class InterfacciaCassa:
+class InterfacciaCassa(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = "vertical"
+        self.valuta_corrente = "CHF" 
+        self.orientation = "vertical"
+        self.add_widget(self.crea_menu_superiore(self))
+        self.add_widget(self.crea_schermata_vendita(self))
     @staticmethod
     def crea_menu_superiore(app_instance):
         nav_layout = BoxLayout(size_hint_y=None, height=dp(64), padding=0, spacing=10)
@@ -155,30 +162,36 @@ class InterfacciaCassa:
             conn = sqlite3.connect('database/negozio.db')
             cursor = conn.cursor()
             try:
-                cursor.execute('SELECT id, nome, attivo, standby, colore_r, col_t FROM config_reparti')
+                cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
                 rows = cursor.fetchall()
             except sqlite3.OperationalError:
-                # Fallback se le colonne di colore/standby non esistono ancora
                 cursor.execute('SELECT id, nome FROM config_reparti')
                 raw_rows = cursor.fetchall()
-                # Adattiamo i dati aggiungendo valori di default (attivo=1, standby=0, colori vuoti)
-                rows = [(r[0], r[1], 1, 0, 0, 0, 0, 0) for r in raw_rows]
+                rows = [(r[0], r[1], 1, 0, 0.0, 0.18, 0.55, 1.0) for r in raw_rows]
             conn.close()
 
             for row in rows:
-                r_id, r_nome, r_attivo, r_standby = row[0], row[1], row[2], row[3]
+                r_id, r_nome, r_attivo, r_standby, cr, cg, cb, ca = row
                 nome_visualizzato = r_nome.strip() if hasattr(r_nome, 'strip') else str(r_nome)
+                if not nome_visualizzato:
+                    nome_visualizzato = f'Reparto {r_id}'
                 
+                # Tronchiamo i nomi troppo lunghi per evitare accavallamenti grafici
+                if len(nome_visualizzato) > 14:
+                    nome_visualizzato = nome_visualizzato[:12] + '..'
+
+                rgba = (cr, cg, cb, ca) if (cr is not None and cg is not None and cb is not None) else (0.0, 0.18, 0.55, 1.0)
+
                 if not r_attivo:
-                    b = CustomButton(text=f"{nome_visualizzato} (Disatt.)")
+                    b = CustomButton(text=f"{nome_visualizzato}\n(Disatt.)", font_size='11sp', background_normal='', background_color=(0.25, 0.25, 0.25, 1))
                     b.disabled = True
                 elif r_standby:
-                    b = CustomButton(text=f"{nome_visualizzato} [STANDBY]")
+                    b = CustomButton(text=f"{nome_visualizzato}\n[STANDBY]", font_size='11sp', background_normal='', background_color=(0.35, 0.35, 0.35, 1))
                     b.disabled = True
                 else:
-                    b = CustomButton(text=str(nome_visualizzato))
-                    b.bind(on_press=lambda instance, r_nome=nome_visualizzato: app_instance.seleziona_reparto(r_nome))
-                    
+                    b = CustomButton(text=str(nome_visualizzato), font_size='12sp', bold=True, background_normal='', background_color=rgba)
+                    b.bind(on_press=lambda instance, n=r_nome.strip(): app_instance.seleziona_reparto(n))
+
                 reparti_grid.add_widget(b)
 
         popola_reparti_db()
@@ -223,3 +236,31 @@ class InterfacciaCassa:
     @staticmethod
     def crea_schermata_storico(app_instance):
         return SchermataChiusura()
+
+    def gestisci_azione_scontrino(self, instance):
+        print(f"[DEBUG] Azione scontrino attivata da {instance}")
+
+    def aggiorna_resto(self, instance, value):
+        print(f"[DEBUG] aggiorna_resto chiamato con valore: {value}")
+        try:
+            pass
+        except Exception as e:
+            print(f"[ERRORE] aggiorna_resto: {e}")
+
+
+
+    def mostra_schermata(self, nome_schermata):
+        print(f"[DEBUG] Cambio schermata verso: {nome_schermata}")
+        try:
+            # Rimuoviamo tutti i widget tranne il menu superiore (indice 0)
+            while len(self.children) > 1:
+                self.remove_widget(self.children[0])
+            
+            if nome_schermata == "storico":
+                schermata = self.crea_schermata_storico(self) if hasattr(self, "crea_schermata_storico") else Label(text="Chiusura & Storico", color=(0,0,0,1))
+            else:
+                schermata = self.crea_schermata_vendita(self) if hasattr(self, "crea_schermata_vendita") else Label(text="Cassa / Vendita", color=(0,0,0,1))
+            
+            self.add_widget(schermata)
+        except Exception as e:
+            print(f"[ERRORE] mostra_schermata: {e}")

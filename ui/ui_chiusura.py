@@ -255,7 +255,7 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
 
     def apri_gestione_pulsanti_pos(self, instance):
         content = BoxLayout(orientation='vertical', padding=15, spacing=10)
-        content.add_widget(Label(text='GESTIONE CENTRALIZZATA 12 SLOT POS (PANTONE)', font_size=18, bold=True, size_hint_y=None, height=40))
+        content.add_widget(Label(text='GESTIONE CENTRALIZZATA 12 SLOT POS (NOME & STATO)', font_size=18, bold=True, size_hint_y=None, height=40))
 
         grid_slot = GridLayout(cols=1, spacing=8, size_hint_y=None)
         grid_slot.bind(minimum_height=grid_slot.setter('height'))
@@ -285,12 +285,6 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
             ('Pantone Black 6 C', (0.1, 0.1, 0.1, 1.0))
         ]
 
-        def trova_nome_pantone(r, g, b):
-            for nome_p, val in pantone_palette:
-                if abs(val[0] - r) < 0.15 and abs(val[1] - g) < 0.15 and abs(val[2] - b) < 0.15:
-                    return nome_p
-            return 'Pantone 286 C'
-
         slot_riferimenti = {}
 
         def carica_dati_slot():
@@ -314,15 +308,28 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
 
             for row in rows:
                 r_id, r_nome, r_attivo, r_standby, cr, cg, cb, ca = row
-                
-                current_slot_data = {
+
+                row_state = {
+                    'attivo': r_attivo,
+                    'standby': r_standby,
                     'rgba': [cr, cg, cb, ca]
                 }
 
-                box_riga = BoxLayout(orientation='horizontal', spacing=8, size_hint_y=None, height=45)
+                box_riga = BoxLayout(orientation='horizontal', spacing=10, size_hint_y=None, height=45)
+                
+                # 1. ID Slot
+                box_riga.add_widget(Label(text=f'#{r_id}', size_hint_x=None, width=35, bold=True))
 
-                txt_nome = TextInput(text=str(r_nome or ''), multiline=False, hint_text=f'Slot {r_id}', size_hint_x=0.35)
+                # 2. Nome Reparto (TextInput con sfondo colorato come clone del reparto)
+                txt_nome = TextInput(text=str(r_nome or ''), multiline=False, hint_text=f'Slot {r_id}', size_hint_x=0.55, background_color=(cr, cg, cb, ca))
+                
+                # Regoliamo il colore del testo in base alla luminanza per renderlo sempre leggibile
+                lum_txt = (cr * 0.299 + cg * 0.587 + cb * 0.114)
+                txt_nome.foreground_color = (0, 0, 0, 1) if lum_txt > 0.5 else (1, 1, 1, 1)
 
+                box_riga.add_widget(txt_nome)
+
+                # 3. Pulsante STATO centrale
                 if r_standby:
                     stato_txt = 'Standby'
                 elif r_attivo:
@@ -330,70 +337,79 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
                 else:
                     stato_txt = 'Disattivato'
 
-                btn_stato = Button(text=stato_txt, size_hint_x=0.2, background_normal='', background_color=(0.3, 0.3, 0.3, 1))
+                btn_stato = Button(text=stato_txt, size_hint_x=0.25, background_normal='', background_color=(0.3, 0.3, 0.3, 1), font_size=13, bold=True)
 
-                colore_attuale_nome = trova_nome_pantone(cr, cg, cb)
-                btn_colore = Button(text=colore_attuale_nome, size_hint_x=0.25, background_normal='', background_color=(cr, cg, cb, ca))
-
-                def make_stato_callback(b_st_target, current_id):
-                    def apri_popup_stato(inst):
-                        box_s = BoxLayout(orientation='vertical', padding=10, spacing=10)
+                def make_stato_callback(b_st_target, s_ref, current_id):
+                    def apri_popup_stato(instance):
+                        box_s = BoxLayout(orientation='vertical', padding=12, spacing=10)
                         pop_s = Popup(title=f'Seleziona Stato - Slot #{current_id}', content=box_s, size_hint=(0.5, 0.4))
                         for st in ['Attivo', 'Standby', 'Disattivato']:
-                            def imposta_st(i, s=st):
-                                b_st_target.text = s
+                            def imposta_st(inst_b, s_val=st):
+                                if s_val == 'Attivo':
+                                    s_ref['attivo'] = 1; s_ref['standby'] = 0
+                                elif s_val == 'Standby':
+                                    s_ref['attivo'] = 1; s_ref['standby'] = 1
+                                else:
+                                    s_ref['attivo'] = 0; s_ref['standby'] = 0
+                                b_st_target.text = s_val
                                 pop_s.dismiss()
-                            b = Button(text=st, font_size=16)
+                            b = Button(text=st, font_size=15, background_normal='', background_color=(0.25, 0.25, 0.25, 1))
                             b.bind(on_press=imposta_st)
                             box_s.add_widget(b)
                         pop_s.open()
                     return apri_popup_stato
 
-                def make_pantone_callback(b_col_target, slot_data_ref, current_id):
-                    def apri_popup_pantone(inst):
+                btn_stato.bind(on_press=make_stato_callback(btn_stato, row_state, r_id))
+                box_riga.add_widget(btn_stato)
+
+                # 4. Pulsante COLORE a destra (che clona istantaneamente il colore anche sul TextInput di sinistra)
+                btn_colore = Button(text='Cambia Colore', size_hint_x=0.25, background_normal='', background_color=(cr, cg, cb, ca), font_size=13, bold=True)
+                btn_colore.color = (0, 0, 0, 1) if lum_txt > 0.5 else (1, 1, 1, 1)
+
+                def make_pantone_callback(b_col_target, txt_target, s_ref, current_id):
+                    def apri_popup_pantone(instance):
                         box_p = BoxLayout(orientation='vertical', padding=10, spacing=8)
                         sv_p = ScrollView()
                         grid_p = GridLayout(cols=1, spacing=5, size_hint_y=None)
                         grid_p.bind(minimum_height=grid_p.setter('height'))
-
-                        pop_p = Popup(title=f'Seleziona Pantone - Slot #{current_id}', content=box_p, size_hint=(0.7, 0.7))
+                        pop_p = Popup(title=f'Seleziona Colore Pantone - Slot #{current_id}', content=box_p, size_hint=(0.65, 0.75))
 
                         for p_nome, p_rgba in pantone_palette:
-                            def make_select(pn, prgba):
-                                def imposta_colore(i):
-                                    slot_data_ref['rgba'] = list(prgba)
-                                    b_col_target.text = pn
-                                    b_col_target.background_color = prgba
+                            def make_select(name_val, rgba_val):
+                                def imposta_colore(inst_c):
+                                    s_ref['rgba'] = list(rgba_val)
+                                    # Aggiorna il bottore destro
+                                    b_col_target.background_color = rgba_val
+                                    l = (rgba_val[0]*0.299 + rgba_val[1]*0.587 + rgba_val[2]*0.114)
+                                    b_col_target.color = (0, 0, 0, 1) if l > 0.5 else (1, 1, 1, 1)
+                                    
+                                    # Clona il colore istantaneamente sul TextInput di sinistra
+                                    txt_target.background_color = rgba_val
+                                    txt_target.foreground_color = (0, 0, 0, 1) if l > 0.5 else (1, 1, 1, 1)
+                                    
                                     pop_p.dismiss()
                                 return imposta_colore
 
                             bc = Button(text=p_nome, background_normal='', background_color=p_rgba, size_hint_y=None, height=40, font_size=14)
+                            bc.color = (0, 0, 0, 1) if (p_rgba[0]*0.299 + p_rgba[1]*0.587 + p_rgba[2]*0.114) > 0.5 else (1, 1, 1, 1)
                             bc.bind(on_press=make_select(p_nome, p_rgba))
                             grid_p.add_widget(bc)
 
                         sv_p.add_widget(grid_p)
                         box_p.add_widget(sv_p)
-
-                        btn_chiudi_p = Button(text='Annulla', size_hint_y=None, height=40)
+                        btn_chiudi_p = Button(text='Annulla', size_hint_y=None, height=40, background_normal='', background_color=(0.5, 0.2, 0.2, 1))
                         btn_chiudi_p.bind(on_press=pop_p.dismiss)
                         box_p.add_widget(btn_chiudi_p)
-
                         pop_p.open()
                     return apri_popup_pantone
 
-                btn_stato.bind(on_press=make_stato_callback(btn_stato, r_id))
-                btn_colore.bind(on_press=make_pantone_callback(btn_colore, current_slot_data, r_id))
+                btn_colore.bind(on_press=make_pantone_callback(btn_colore, txt_nome, row_state, r_id))
+                box_riga.add_widget(btn_colore)
 
                 slot_riferimenti[r_id] = {
                     'txt_nome': txt_nome,
-                    'btn_stato': btn_stato,
-                    'slot_data': current_slot_data
+                    'row_state': row_state
                 }
-
-                box_riga.add_widget(Label(text=f'#{r_id}', size_hint_x=None, width=35, bold=True))
-                box_riga.add_widget(txt_nome)
-                box_riga.add_widget(btn_stato)
-                box_riga.add_widget(btn_colore)
 
                 grid_slot.add_widget(box_riga)
 
@@ -404,7 +420,7 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
         content.add_widget(sv)
 
         bottom_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=50, spacing=10)
-        popup = Popup(title='Gestione Pulsanti POS (12 Slot Fissi - Pantone)', content=content, size_hint=(0.9, 0.85))
+        popup = Popup(title='Gestione Centralizzata 12 Slot POS (Nome & Stato)', content=content, size_hint=(0.85, 0.85))
 
         def salva_tutto(inst):
             import sqlite3
@@ -412,24 +428,18 @@ TOTALE GENERALE INCASSATO: CHF 1005.00
             cu = cx.cursor()
             for sid, widgets in slot_riferimenti.items():
                 n_val = widgets['txt_nome'].text.strip()
-                s_val = widgets['btn_stato'].text.strip()
-                rgba = widgets['slot_data']['rgba']
-
-                if s_val == 'Standby':
-                    attivo = 1
-                    standby = 1
-                elif s_val == 'Attivo':
-                    attivo = 1
-                    standby = 0
-                else:
-                    attivo = 0
-                    standby = 0
+                s_ref = widgets['row_state']
+                attivo = s_ref['attivo']
+                standby = s_ref['standby']
+                rgba = s_ref['rgba']
 
                 cu.execute('UPDATE config_reparti SET nome = ?, attivo = ?, standby = ?, colore_r = ?, colore_g = ?, colore_b = ?, colore_a = ? WHERE id = ?',
                            (n_val, attivo, standby, rgba[0], rgba[1], rgba[2], rgba[3], sid))
             cx.commit()
             cx.close()
-            print("[OK] Salvataggio completato correttamente per tutti i 12 slot!")
+            print("[OK] Salvataggio completato!")
+            if hasattr(self, 'aggiorna_griglia_reparti') and self.aggiorna_griglia_reparti:
+                self.aggiorna_griglia_reparti()
             carica_dati_slot()
 
         btn_salva = Button(text='Salva Modifiche', background_normal='', background_color=(0.1, 0.5, 0.2, 1), font_size=14, bold=True)
