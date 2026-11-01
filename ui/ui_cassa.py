@@ -156,11 +156,21 @@ class InterfacciaCassa(BoxLayout):
             pass
 
         def popola_reparti_db():
-            print('DEBUG: Esecuzione popola_reparti_db allineata rigorosamente per ID')
+            print('DEBUG: Esecuzione popola_reparti_db clonata da gestione centralizzata')
             reparti_grid.clear_widgets()
             import sqlite3
             conn = sqlite3.connect('database/negozio.db')
             cursor = conn.cursor()
+            cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
+            rows = cursor.fetchall()
+            
+            existing_ids = [r[0] for r in rows]
+            for i in range(1, 13):
+                if i not in existing_ids:
+                    cursor.execute('INSERT OR REPLACE INTO config_reparti (id, nome, colore_r, colore_g, colore_b, colore_a, attivo, standby) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                                 (i, f'Reparto {i}' if i <= 11 else '', 0.0, 0.18, 0.55, 1.0, 1 if i <= 11 else 0, 0))
+            conn.commit()
+            
             cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
             rows = cursor.fetchall()
             conn.close()
@@ -189,7 +199,8 @@ class InterfacciaCassa(BoxLayout):
                     b = CustomButton(text=str(nome_visualizzato), font_size='11sp', bold=True)
                     b.set_color(rgba)
                     b.color = txt_color
-                    b.bind(on_press=lambda instance, n=r_nome.strip(): app_instance.seleziona_reparto(n))
+                    # Collegamento basato sull ID o sul nome coerente
+                    b.bind(on_press=lambda instance, n=r_nome.strip(), rid=r_id: app_instance.seleziona_reparto(n))
 
                 reparti_grid.add_widget(b)
 
