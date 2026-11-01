@@ -27,21 +27,21 @@ class InterfacciaMagazzino(BoxLayout):
         top_layout = BoxLayout(size_hint_y=None, height=45, spacing=10)
         top_layout.add_widget(Label(text="Gestione Magazzino (Stile Odoo)", font_size=18, bold=True, color=(0.1, 0.1, 0.1, 1)))
         
-        self.btn_vista_elenco = Button(text='Elenco', size_hint_x=None, width=95, background_color=(0.1, 0.4, 0.6, 1))
-        self.btn_vista_griglia = Button(text='Griglia', size_hint_x=None, width=95, background_color=(0.1, 0.4, 0.6, 1))
-        self.btn_esporta_excel = Button(text='Esporta', size_hint_x=None, width=95, background_color=(0.2, 0.6, 0.2, 1))
+        self.btn_vista_elenco = Button(text='Elenco', size_hint_x=None, width=95, background_normal='', background_color=(0.1, 0.4, 0.6, 1))
+        self.btn_vista_griglia = Button(text='Griglia', size_hint_x=None, width=95, background_normal='', background_color=(0.1, 0.4, 0.6, 1))
+        self.btn_esporta_excel = Button(text='Esporta', size_hint_x=None, width=95, background_normal='', background_color=(0.2, 0.6, 0.2, 1))
         self.btn_vista_elenco.bind(on_press=lambda x: self.cambia_vista('elenco'))
         top_layout.add_widget(self.btn_vista_elenco)
 
-        self.btn_vista_griglia = Button(text="Vista Griglia", size_hint_x=None, width=110, background_color=(0.3, 0.3, 0.3, 1))
+        self.btn_vista_griglia = Button(text="Vista Griglia", size_hint_x=None, width=110, background_normal='', background_color=(0.3, 0.3, 0.3, 1))
         self.btn_vista_griglia.bind(on_press=lambda x: self.cambia_vista('griglia'))
         top_layout.add_widget(self.btn_vista_griglia)
 
-        btn_export = Button(text="Esporta Excel", size_hint_x=None, width=110, background_color=(0.1, 0.6, 0.2, 1))
+        btn_export = Button(text="Esporta Excel", size_hint_x=None, width=110, background_normal='', background_color=(0.1, 0.6, 0.2, 1))
         btn_export.bind(on_press=self.esporta_dati)
         top_layout.add_widget(btn_export)
 
-        btn_import = Button(text="Importa Excel", size_hint_x=None, width=110, background_color=(0.2, 0.4, 0.8, 1))
+        btn_import = Button(text="Importa Excel", size_hint_x=None, width=110, background_normal='', background_color=(0.2, 0.4, 0.8, 1))
         btn_import.bind(on_press=self.importa_dati)
         top_layout.add_widget(btn_import)
         
@@ -52,7 +52,7 @@ class InterfacciaMagazzino(BoxLayout):
         self.input_ricerca.bind(text=lambda instance, value: self.aggiorna_lista_prodotti())
         filter_layout.add_widget(self.input_ricerca)
 
-        self.btn_filtro_avanzato = Button(text='Raggruppa per...', size_hint_x=0.35, background_color=(0.2, 0.2, 0.2, 1))
+        self.btn_filtro_avanzato = Button(text='Raggruppa per...', size_hint_x=0.35, background_normal='', background_color=(0.2, 0.2, 0.2, 1))
         self.btn_filtro_avanzato.bind(on_release=self.apri_popup_raggruppamento)
         filter_layout.add_widget(self.btn_filtro_avanzato)
 
@@ -113,12 +113,12 @@ class InterfacciaMagazzino(BoxLayout):
         foto_box.add_widget(Label(text='Foto Prodotto', font_size=12, bold=True, size_hint_y=None, height=18, color=(0.1, 0.1, 0.1, 1)))
         
         # Pulsante Scegli Immagine
-        # btn_rimosso = Button(text='Scegli Immagine...', size_hint_y=None, height=35, background_color=(0.1, 0.4, 0.7, 1))
+        # btn_rimosso = Button(text='Scegli Immagine...', size_hint_y=None, height=35, background_normal='', background_color=(0.1, 0.4, 0.7, 1))
         # btn_rimosso.bind(on_press=self.seleziona_immagine)
         # rimosso nome errato
 
         self.input_foto = TextInput(text='', multiline=False, font_size=11, hint_text='Path immagine...', size_hint_y=None, height=30)
-        self.btn_anteprima_foto = Button(text='[ 📷 Quadrata\n130 x 130 ]', font_size=12, background_color=(0.88, 0.88, 0.90, 1), color=(0.2, 0.2, 0.2, 1))
+        self.btn_anteprima_foto = Button(text='[ 📷 Quadrata\n130 x 130 ]', font_size=12, background_normal='', background_color=(0.88, 0.88, 0.90, 1), color=(0.2, 0.2, 0.2, 1))
         self.btn_anteprima_foto.bind(on_press=self.seleziona_immagine)
         
         foto_box.add_widget(self.btn_anteprima_foto)
@@ -160,11 +160,11 @@ class InterfacciaMagazzino(BoxLayout):
         right_main_layout.add_widget(form_grid)
 
         actions_layout = BoxLayout(size_hint_y=None, height=45, spacing=10)
-        btn_salva = Button(text='Salva Modifiche / Nuovo', background_color=(0.1, 0.5, 0.8, 1))
+        btn_salva = Button(text='Salva Modifiche / Nuovo', background_normal='', background_color=(0.1, 0.5, 0.8, 1))
         btn_salva.bind(on_press=self.salva_prodotto)
         actions_layout.add_widget(btn_salva)
 
-        btn_elimina = Button(text='Elimina Selezionati / Corrente', background_color=(0.8, 0.2, 0.2, 1))
+        btn_elimina = Button(text='Elimina Selezionati / Corrente', background_normal='', background_color=(0.8, 0.2, 0.2, 1))
         btn_elimina.bind(on_press=self.elimina_prodotto)
         actions_layout.add_widget(btn_elimina)
 
@@ -237,8 +237,8 @@ class InterfacciaMagazzino(BoxLayout):
         content.add_widget(scroll)
 
         bottom_btns = BoxLayout(size_hint_y=None, height=45, spacing=10)
-        btn_applica = Button(text='Applica Raggruppamento', background_color=(0.1, 0.4, 0.7, 1))
-        btn_annulla = Button(text='Chiudi', background_color=(0.5, 0.5, 0.5, 1))
+        btn_applica = Button(text='Applica Raggruppamento', background_normal='', background_color=(0.1, 0.4, 0.7, 1))
+        btn_annulla = Button(text='Chiudi', background_normal='', background_color=(0.5, 0.5, 0.5, 1))
         bottom_btns.add_widget(btn_applica)
         bottom_btns.add_widget(btn_annulla)
         content.add_widget(bottom_btns)
@@ -408,14 +408,14 @@ class InterfacciaMagazzino(BoxLayout):
                 self.checkboxes_prodotti[p_id] = chk
                 top_card.add_widget(chk)
                 
-                btn_nome = Button(text=nome_str, bold=True, size_hint_y=None, height=25, background_color=(0.85, 0.85, 0.85, 1), color=(0, 0, 0, 1), halign='left')
+                btn_nome = Button(text=nome_str, bold=True, size_hint_y=None, height=25, background_normal='', background_color=(0.85, 0.85, 0.85, 1), color=(0, 0, 0, 1), halign='left')
                 btn_nome.bind(size=lambda s, w: setattr(s, 'text_size', (s.width - 10, s.height)))
                 btn_nome.bind(on_press=lambda instance, pid=p_id: self.seleziona_prodotto(pid))
                 top_card.add_widget(btn_nome)
                 card_box.add_widget(top_card)
 
                 info_testo = f"Lotto: {lotto_str} | Prezzo: CHF {prezzo_val:.2f} | Giac: {giac_val}\nBar: {barcode_str}"
-                btn_dett = Button(text=info_testo, font_size=11, size_hint_y=None, height=60, background_color=(0.92, 0.92, 0.92, 1), color=(0, 0, 0, 1), halign='left', valign='middle')
+                btn_dett = Button(text=info_testo, font_size=11, size_hint_y=None, height=60, background_normal='', background_color=(0.92, 0.92, 0.92, 1), color=(0, 0, 0, 1), halign='left', valign='middle')
                 btn_dett.bind(size=lambda s, w: setattr(s, 'text_size', (s.width - 10, s.height)))
                 btn_dett.bind(on_press=lambda instance, pid=p_id: self.seleziona_prodotto(pid))
                 card_box.add_widget(btn_dett)
@@ -629,8 +629,8 @@ class InterfacciaMagazzino(BoxLayout):
         content.add_widget(filechooser)
 
         btn_layout = BoxLayout(size_hint_y=None, height=40, spacing=10)
-        btn_seleziona = Button(text='Seleziona', background_color=(0.1, 0.4, 0.7, 1))
-        btn_chiudi = Button(text='Annulla', background_color=(0.5, 0.5, 0.5, 1))
+        btn_seleziona = Button(text='Seleziona', background_normal='', background_color=(0.1, 0.4, 0.7, 1))
+        btn_chiudi = Button(text='Annulla', background_normal='', background_color=(0.5, 0.5, 0.5, 1))
         
         btn_layout.add_widget(btn_seleziona)
         btn_layout.add_widget(btn_chiudi)
