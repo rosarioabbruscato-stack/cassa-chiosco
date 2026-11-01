@@ -156,40 +156,39 @@ class InterfacciaCassa(BoxLayout):
             pass
 
         def popola_reparti_db():
-            print('DEBUG: Esecuzione popola_reparti_db')
+            print('DEBUG: Esecuzione popola_reparti_db allineata rigorosamente per ID')
             reparti_grid.clear_widgets()
             import sqlite3
             conn = sqlite3.connect('database/negozio.db')
             cursor = conn.cursor()
-            try:
-                cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
-                rows = cursor.fetchall()
-            except sqlite3.OperationalError:
-                cursor.execute('SELECT id, nome FROM config_reparti')
-                raw_rows = cursor.fetchall()
-                rows = [(r[0], r[1], 1, 0, 0.0, 0.18, 0.55, 1.0) for r in raw_rows]
+            cursor.execute('SELECT id, nome, attivo, standby, colore_r, colore_g, colore_b, colore_a FROM config_reparti WHERE id BETWEEN 1 AND 12 ORDER BY id ASC')
+            rows = cursor.fetchall()
             conn.close()
 
             for row in rows:
                 r_id, r_nome, r_attivo, r_standby, cr, cg, cb, ca = row
                 nome_visualizzato = r_nome.strip() if hasattr(r_nome, 'strip') else str(r_nome)
                 if not nome_visualizzato:
-                    nome_visualizzato = f'Reparto {r_id}'
-                
-                # Tronchiamo i nomi troppo lunghi per evitare accavallamenti grafici
-                if len(nome_visualizzato) > 14:
-                    nome_visualizzato = nome_visualizzato[:12] + '..'
+                    nome_visualizzato = f'Slot {r_id}'
 
                 rgba = (cr, cg, cb, ca) if (cr is not None and cg is not None and cb is not None) else (0.0, 0.18, 0.55, 1.0)
+                lum = (rgba[0] * 0.299 + rgba[1] * 0.587 + rgba[2] * 0.114)
+                txt_color = (0, 0, 0, 1) if lum > 0.5 else (1, 1, 1, 1)
 
                 if not r_attivo:
-                    b = CustomButton(text=f"{nome_visualizzato}\n(Disatt.)", font_size='11sp', background_normal='', background_color=(0.25, 0.25, 0.25, 1))
+                    b = CustomButton(text=f"{nome_visualizzato}\n(Disatt.)", font_size='10sp')
+                    b.set_color((0.25, 0.25, 0.25, 1))
+                    b.color = (0.8, 0.8, 0.8, 1)
                     b.disabled = True
                 elif r_standby:
-                    b = CustomButton(text=f"{nome_visualizzato}\n[STANDBY]", font_size='11sp', background_normal='', background_color=(0.35, 0.35, 0.35, 1))
+                    b = CustomButton(text=f"{nome_visualizzato}\n[STANDBY]", font_size='10sp')
+                    b.set_color((0.35, 0.35, 0.35, 1))
+                    b.color = (0.9, 0.9, 0.9, 1)
                     b.disabled = True
                 else:
-                    b = CustomButton(text=str(nome_visualizzato), font_size='12sp', bold=True, background_normal='', background_color=rgba)
+                    b = CustomButton(text=str(nome_visualizzato), font_size='11sp', bold=True)
+                    b.set_color(rgba)
+                    b.color = txt_color
                     b.bind(on_press=lambda instance, n=r_nome.strip(): app_instance.seleziona_reparto(n))
 
                 reparti_grid.add_widget(b)
