@@ -12,6 +12,12 @@ from kivy.metrics import dp
 
 
 class InterfacciaCassa(BoxLayout):
+    def seleziona_reparto(self, nome_reparto):
+        print(f"DEBUG: Reparto selezionato: {nome_reparto}")
+        if hasattr(self, "lbl_stato_corrente") and self.lbl_stato_corrente:
+            self.lbl_stato_corrente.text = f"Reparto selezionato: {nome_reparto}. Inserisci Q.tà o Prezzo."
+        self.reparto_corrente = nome_reparto
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = "vertical"
@@ -268,6 +274,8 @@ class InterfacciaCassa(BoxLayout):
             
             if nome_schermata == "storico":
                 schermata = self.crea_schermata_storico(self) if hasattr(self, "crea_schermata_storico") else Label(text="Chiusura & Storico", color=(0,0,0,1))
+            elif nome_schermata == "magazzino":
+                schermata = self.crea_schermata_magazzino(self) if hasattr(self, "crea_schermata_magazzino") else Label(text="Magazzino", color=(0,0,0,1))
             else:
                 schermata = self.crea_schermata_vendita(self) if hasattr(self, "crea_schermata_vendita") else Label(text="Cassa / Vendita", color=(0,0,0,1))
             
