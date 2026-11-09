@@ -43,10 +43,8 @@ version = 0.3
 # (list) Application requirements
 <<<<<<< HEAD
 # comma separated e.g. requirements = python3,kivy
-requirements = python3,kivy
 =======
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,pyjnius,et_xmlfile,openpyxl,et_xmlfile,openpyxl,et_xmlfile
 >>>>>>> 7008899d (Aggiunge openpyxl ed et_xmlfile ai requisiti Buildozer)
 
 # (str) Custom source folders for requirements
@@ -498,3 +496,4 @@ warn_on_root = 1
 #   Environment variable overrides have priority over profile overrides.
 android.ndk = 25.2.9519653
 android.ndk_version = 0.3
+requirements = python3,kivy,openpyxl,et_xmlfile
