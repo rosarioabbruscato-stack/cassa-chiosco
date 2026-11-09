@@ -9,7 +9,7 @@
 title = My Application
 
 # (str) Package name
-package.name = cassachiosco
+package.name = myapp
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -41,8 +41,13 @@ version = 0.3
 # version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
+<<<<<<< HEAD
 # comma separated e.g. requirements = python3,kivy
 requirements = python3,kivy
+=======
+# comma separated e.g. requirements = sqlite3,kivy
+requirements = python3,kivy,pyjnius,et_xmlfile,openpyxl,et_xmlfile,openpyxl,et_xmlfile
+>>>>>>> 7008899d (Aggiunge openpyxl ed et_xmlfile ai requisiti Buildozer)
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -454,7 +459,7 @@ warn_on_root = 1
 #   Warning: Indented text is treated as a multiline string - i.e.
 #       [app]
 #       title = My Application
-#          package.name = cassachiosco # This is all part of the title.
+#          package.name = myapp # This is all part of the title.
 #
 #   Buildozer's .spec files have some additional features:
 #
