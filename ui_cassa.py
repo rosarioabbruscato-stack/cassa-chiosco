@@ -1,3 +1,4 @@
+from kivy.app import App
 import sqlite3
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -196,7 +197,18 @@ class InterfacciaCassa:
             lbl = Label(text=f"#{v_id} | {data} | {app_instance.valuta_corrente} {tot:.2f} ({pag}) [Op: {op}]", size_hint_y=None, height=40, halign='left', color=(0.2, 0.2, 0.2, 1))
             lbl.bind(size=lbl.setter('text_size'))
             box_vendite.add_widget(lbl)
-            
-        scroll.add_widget(box_vendite)
-        layout.add_widget(scroll)
-        return layout
+
+class CassaChioscoApp(App):
+    valuta_corrente = "CHF"
+
+    def gestisci_azione_scontrino(self, instance):
+        print("[DEBUG] gestisci_azione_scontrino premuto")
+
+    def aggiorna_resto(self, instance, value):
+        print(f"[DEBUG] aggiorna_resto chiamato con valore: {value}")
+
+    def build(self):
+        return InterfacciaCassa.crea_schermata_vendita(self)
+
+if __name__ == '__main__':
+    CassaChioscoApp().run()
