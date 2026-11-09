@@ -492,5 +492,4 @@ warn_on_root = 1
 #
 #   Environment variable overrides have priority over profile overrides.
 android.ndk = 25.2.9519653
-android.ndk_version = 0.3
 requirements = python3,kivy,openpyxl,et_xmlfile
