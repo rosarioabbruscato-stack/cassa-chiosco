@@ -41,11 +41,8 @@ version = 0.3
 # version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
-<<<<<<< HEAD
 # comma separated e.g. requirements = python3,kivy
-=======
 # comma separated e.g. requirements = sqlite3,kivy
->>>>>>> 7008899d (Aggiunge openpyxl ed et_xmlfile ai requisiti Buildozer)
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
