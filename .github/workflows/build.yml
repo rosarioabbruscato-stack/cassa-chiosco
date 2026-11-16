@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build with Buildozer Docker
+      - name: Build Android APK
         run: |
           docker run --rm \
             -e BUILDOZER_WARN_ON_ROOT=0 \
@@ -20,14 +20,20 @@ jobs:
             --entrypoint /bin/bash \
             kivy/buildozer:latest \
             -lc '
-              mkdir -p /home/user/.buildozer/android/platform/android-sdk/licenses
+              set -e
 
-              printf "%s\n" \
-                "8933bad161af4178b1185d1a37fbf41ea5269c55" \
-                "d56f5187479451eabf01fb78af6dfcb131a6481e" \
-                > /home/user/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+              # Installazione Rust nel container
+              curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs \
+                | sh -s -- -y --profile minimal
 
-              yes | buildozer -v android debug
+              export PATH="$HOME/.cargo/bin:$PATH"
+
+              rustup --version
+              rustc --version
+              cargo --version
+
+              # Compilazione APK
+              buildozer -v android debug
             '
 
       - name: Upload APK Artifact
