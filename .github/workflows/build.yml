@@ -2,11 +2,16 @@ name: Build APK
 
 on:
   push:
-    branches: [ principale, main ]
+    branches: [principale, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 120
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,63 +27,66 @@ jobs:
             kivy/buildozer:latest \
             -lc '
               set -euo pipefail
+              export DEBIAN_FRONTEND=noninteractive
 
-              # Dipendenze per Rust e cryptography
               apt-get update
               apt-get install -y --no-install-recommends \
-                curl ca-certificates build-essential \
-                pkg-config libssl-dev
+                curl ca-certificates unzip zip \
+                build-essential pkg-config libssl-dev
 
-              # Rust
               if ! command -v rustup >/dev/null 2>&1; then
-                curl --proto "=https" --tlsv1.2 -sSf \
-                  https://sh.rustup.rs |
-                  sh -s -- -y --profile minimal
+                curl --proto "=https" --tlsv1.2 -fsSL https://sh.rustup.rs \
+                  | sh -s -- -y --profile minimal
               fi
-
               export PATH="$HOME/.cargo/bin:$PATH"
               rustup --version
+              rustc --version
               cargo --version
 
-              # SDK usato da Buildozer
               SDK="$HOME/.buildozer/android/platform/android-sdk"
+              mkdir -p "$SDK/cmdline-tools" "$SDK/licenses"
 
-              # Accettazione delle licenze SDK
-              mkdir -p "$SDK/licenses"
+              if [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
+                curl -fL --retry 3 \
+                  -o /tmp/android-commandlinetools.zip \
+                  https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+                mkdir -p /tmp/android-commandlinetools
+                unzip -q /tmp/android-commandlinetools.zip -d /tmp/android-commandlinetools
+                mv /tmp/android-commandlinetools/cmdline-tools "$SDK/cmdline-tools/latest"
+              fi
+
+              SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+              test -x "$SDKMANAGER"
+
               printf "%s\n" \
                 "8933bad161af4178b1185d1a37fbf41ea5269c55" \
                 "d56f5187479451eabf01fb78af6dfcb131a6481e" \
                 > "$SDK/licenses/android-sdk-license"
 
-              # Individuazione di sdkmanager
-              SDKMANAGER=""
-              for candidate in \
-                "$SDK/cmdline-tools/latest/bin/sdkmanager" \
-                "$SDK/tools/bin/sdkmanager"
-              do
-                if [ -x "$candidate" ]; then
-                  SDKMANAGER="$candidate"
-                  break
-                fi
-              done
+              "$SDKMANAGER" --sdk_root="$SDK" \
+                "platform-tools" \
+                "platforms;android-36" \
+                "build-tools;36.0.0"
 
-              # Se il gestore SDK è disponibile, installa esplicitamente i Build-Tools.
-              if [ -n "$SDKMANAGER" ]; then
-                yes | "$SDKMANAGER" \
-                  --sdk_root="$SDK" --licenses || true
-
-                "$SDKMANAGER" --sdk_root="$SDK" \
-                  "platform-tools" \
-                  "platforms;android-36" \
-                  "build-tools;36.0.0"
+              AIDL="$SDK/build-tools/36.0.0/aidl"
+              if [ ! -x "$AIDL" ]; then
+                echo "ERROR: Android AIDL is missing or not executable: $AIDL" >&2
+                exit 1
               fi
+              ls -l "$AIDL"
 
-              # Avvio Buildozer
               buildozer -v android debug
             '
+
+      - name: Verify APK
+        shell: bash
+        run: |
+          ls -lh bin/ || true
+          compgen -G 'bin/*.apk' > /dev/null
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: myapp-debug
           path: bin/*.apk
+          if-no-files-found: error
