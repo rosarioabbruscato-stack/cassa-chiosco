@@ -20,19 +20,25 @@ jobs:
             --entrypoint /bin/bash \
             kivy/buildozer:latest \
             -lc '
-              set -e
+              set -euo pipefail
 
-              # Installazione Rust nel container
+              # Installazione strumenti mancanti
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                curl ca-certificates build-essential pkg-config libssl-dev
+
+              # Installazione Rust
               curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs \
                 | sh -s -- -y --profile minimal
 
               export PATH="$HOME/.cargo/bin:$PATH"
 
+              # Verifica
               rustup --version
               rustc --version
               cargo --version
 
-              # Compilazione APK
+              # Compilazione Android
               buildozer -v android debug
             '
 
