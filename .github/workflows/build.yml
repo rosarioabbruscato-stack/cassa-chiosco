@@ -66,14 +66,26 @@ jobs:
               "$SDKMANAGER" --sdk_root="$SDK" \
                 "platform-tools" \
                 "platforms;android-36" \
-                "build-tools;36.0.0"
+                "build-tools;35.0.0"
 
-              AIDL="$SDK/build-tools/36.0.0/aidl"
-              if [ ! -x "$AIDL" ]; then
-                echo "ERROR: Android AIDL is missing or not executable: $AIDL" >&2
+              echo "Installed SDK Build-Tools directories:"
+              ls -la "$SDK/build-tools" || true
+              find "$SDK/build-tools" -maxdepth 2 -name aidl -type f -print || true
+
+              AIDL="$SDK/build-tools/35.0.0/aidl"
+              if [ ! -f "$AIDL" ]; then
+                echo "ERROR: AIDL absent after installing build-tools;35.0.0" >&2
+                "$SDKMANAGER" --sdk_root="$SDK" --list_installed || true
                 exit 1
               fi
+              if [ ! -x "$AIDL" ]; then
+                echo "ERROR: AIDL exists but is not executable: $AIDL" >&2
+                ls -l "$AIDL"
+                exit 1
+              fi
+              echo "AIDL verified: $AIDL"
               ls -l "$AIDL"
+              "$AIDL" --version || true
 
               buildozer -v android debug
             '
