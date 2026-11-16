@@ -1,0 +1,1 @@
+V7.13 - Importa Excel: dialogo nativo Windows tramite tkinter.filedialog.\nLa GUI touchscreen rimane invariata; il pulsante Importa Excel mantiene testo nero su sfondo chiaro.\nLa conferma e la scrittura in Articoli sono identiche alla V7.12.\n

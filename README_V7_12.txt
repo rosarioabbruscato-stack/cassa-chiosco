@@ -1,0 +1,1 @@
+V7.12: Importa Excel riprogettato: selezione file, anteprima, conferma IMPORTA/ANNULLA, risultato. Pulsante grigio azzurro chiaro con testo nero. Le altre sezioni della GUI restano invariate. Necessario openpyxl.\n
