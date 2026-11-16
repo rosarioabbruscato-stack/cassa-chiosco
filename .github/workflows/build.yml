@@ -11,12 +11,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build with official Buildozer Docker image
+      - name: Build with Buildozer Docker
         run: |
           docker run --rm \
-            --volume "$PWD":/home/user/hostcwd \
+            -e BUILDOZER_WARN_ON_ROOT=0 \
+            -v "$PWD":/home/user/hostcwd \
+            -w /home/user/hostcwd \
+            --entrypoint /bin/bash \
             kivy/buildozer:latest \
-            android debug
+            -lc '
+              mkdir -p /home/user/.buildozer/android/platform/android-sdk/licenses
+
+              printf "%s\n" \
+                "8933bad161af4178b1185d1a37fbf41ea5269c55" \
+                "d56f5187479451eabf01fb78af6dfcb131a6481e" \
+                > /home/user/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
+              yes | buildozer -v android debug
+            '
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
