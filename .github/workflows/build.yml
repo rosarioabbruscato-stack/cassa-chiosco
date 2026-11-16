@@ -12,33 +12,68 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Android APK
+        shell: bash
         run: |
           docker run --rm \
             -e BUILDOZER_WARN_ON_ROOT=0 \
-            -v "$PWD":/home/user/hostcwd \
+            -v "$PWD:/home/user/hostcwd" \
             -w /home/user/hostcwd \
             --entrypoint /bin/bash \
             kivy/buildozer:latest \
             -lc '
               set -euo pipefail
 
-              # Installazione strumenti mancanti
+              # Dipendenze per Rust e cryptography
               apt-get update
               apt-get install -y --no-install-recommends \
-                curl ca-certificates build-essential pkg-config libssl-dev
+                curl ca-certificates build-essential \
+                pkg-config libssl-dev
 
-              # Installazione Rust
-              curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs \
-                | sh -s -- -y --profile minimal
+              # Rust
+              if ! command -v rustup >/dev/null 2>&1; then
+                curl --proto "=https" --tlsv1.2 -sSf \
+                  https://sh.rustup.rs |
+                  sh -s -- -y --profile minimal
+              fi
 
               export PATH="$HOME/.cargo/bin:$PATH"
-
-              # Verifica
               rustup --version
-              rustc --version
               cargo --version
 
-              # Compilazione Android
+              # SDK usato da Buildozer
+              SDK="$HOME/.buildozer/android/platform/android-sdk"
+
+              # Accettazione delle licenze SDK
+              mkdir -p "$SDK/licenses"
+              printf "%s\n" \
+                "8933bad161af4178b1185d1a37fbf41ea5269c55" \
+                "d56f5187479451eabf01fb78af6dfcb131a6481e" \
+                > "$SDK/licenses/android-sdk-license"
+
+              # Individuazione di sdkmanager
+              SDKMANAGER=""
+              for candidate in \
+                "$SDK/cmdline-tools/latest/bin/sdkmanager" \
+                "$SDK/tools/bin/sdkmanager"
+              do
+                if [ -x "$candidate" ]; then
+                  SDKMANAGER="$candidate"
+                  break
+                fi
+              done
+
+              # Se il gestore SDK è disponibile, installa esplicitamente i Build-Tools.
+              if [ -n "$SDKMANAGER" ]; then
+                yes | "$SDKMANAGER" \
+                  --sdk_root="$SDK" --licenses || true
+
+                "$SDKMANAGER" --sdk_root="$SDK" \
+                  "platform-tools" \
+                  "platforms;android-36" \
+                  "build-tools;36.0.0"
+              fi
+
+              # Avvio Buildozer
               buildozer -v android debug
             '
 
