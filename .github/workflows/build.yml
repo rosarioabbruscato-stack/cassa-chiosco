@@ -8,14 +8,15 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer android debug
-          version: master
+      - name: Build with official Buildozer Docker image
+        run: |
+          docker run --rm \
+            --volume "$PWD":/home/user/hostcwd \
+            kivy/buildozer:latest \
+            buildozer android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
